@@ -1,0 +1,82 @@
+---
+title: Les types spéciaux
+description: Les types spéciaux dans typescript
+---
+
+## Les types spéciaux
+
+### any
+
+- On peut considérer any comme un sac pouvant contenir tout et n'importe quoi. Il est très flexible, mais il ne donne aucune information sur son contenu.
+
+```ts
+
+const add = (a: number, b: number) => a + b;
+
+const catName: any = "Mittens";
+const catAge: any = 7;
+
+add(catName, catAge); // Pas d'erreur ce qui n'est pas normal on additionne pas une string et un nombre
+
+```
+
+### unknown
+
+- unknown serait comme un sac mystère contenant un objet, mais on ne sait pas ce qui est à l'intérieur. Avant de pouvoir le manipuler, il faut d'abord vérifier son contenu.
+
+- Comparé à any, on peut dire que unknown est plus strict, car il oblige à vérifier le type avant de manipuler les données.
+
+```ts
+
+const add = (a:number,b:number) =>  console.log(a + b);
+
+const catName: unknown = 5;
+const catAge: unknown = 7;
+
+// Erreur : Type 'unknown' is not assignable to type 'number'.
+add(catName, catAge);
+
+// Oblige à vérifier le type avant de manipuler les données
+if (typeof catName === 'number' && typeof catAge === 'number') {
+  add(catName, catAge); // 12
+}
+
+```
+
+### never
+
+- Si une fonction retourne never, cela signifie qu'elle ne renverra jamais aucune valeur et qu'elle ne termine jamais son exécution
+
+```ts
+
+const throwError = (message: string): never => {
+  throw new Error(message);
+};
+
+function infiniteLoop(): never {
+  while (true) {
+    console.log("Boucle infinie");
+    // Cette fonction ne se termine jamais, car elle entre dans une boucle infinie
+  }
+}
+
+```
+
+### void
+
+- Si une fonction retourne void, cela signifie qu'elle ne renverra jamais aucune valeur
+- si on fait un console.log de la fonction elle retournera undefined
+
+```ts
+
+// Cette fonction n'a pas de valeur de retour,
+// elle sert uniquement à afficher un message
+function logMessage(message: string): void {
+  console.log(message);
+}
+
+// result sera "undefined" car logMessage ne retourne aucune valeur
+const result: void = logMessage("Bonjour le monde !");
+
+
+```

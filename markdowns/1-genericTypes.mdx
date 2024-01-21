@@ -1,0 +1,159 @@
+---
+title: Les types génériques
+description: Les types génériques dans typescript
+---
+
+## Les types génériques
+
+### Exemple avec useState
+
+```ts 
+
+function useState<T>(initialValue: T): [T, (value: T) => void] {
+  let value = initialValue;
+  const setValue = (newValue: T) => {
+    value = newValue;
+  };
+  return [value, setValue];
+}
+
+const [myName, setMyName] = useState('Melvyn');
+// useState prend une valeur de type string (car Melvyn est une string)
+// <T> devient donc une string et transmet donc string à tout les T
+
+```
+
+```ts 
+
+type role = "user" | "admin";
+const [role, setRole] = useState<role>('user');
+
+// On pourra attribuer à role soit user soit admin
+// La c'est important de définir le type que prendra useState
+// <T> deviendra soit user soit admin 
+// Si on fait :
+setRole('test'); // Typescript génèrera une erreur
+
+```
+
+## Les types génériques populaires
+
+### Utility types
+
+- Omit : Omet la clef voulue de l'objet
+
+```ts
+
+type User = {
+  id: number;
+  name: string;
+  email: string;
+}
+
+type UserWithoutId = Omit<User, "id">
+// Le type omettra de rajouter id du type User
+type UserWithoutId = {
+  name: string;
+  email: string;
+}
+// Omit<NomObjet, "clef">
+
+```
+
+- Partial : Transforme toutes les valeurs de l'objet en optionnelle
+
+```ts
+
+type User = {
+  id: number;
+  name: string;
+  email: string;
+}
+
+type UserWithOption = Partial<User>
+// Transforme toutes les valeurs de User en optionnelle
+type UserWithOption = {
+    id?: number | undefined;
+    name?: string | undefined;
+    email?: string | undefined;
+}
+
+// Voici le type de Partial
+type Partial<T> = { [P in keyof T]?: T[P] | undefined; }
+// Pour toutes les clefs (P) de l'objet (T) => transforme toutes les valeurs de l'objet avec le type de la valeur et rajoute undefined
+
+```
+
+- Required : Transforme toutes les valeurs de l'objet en obligatoire
+
+```ts
+
+type User = {
+  id?: number;
+  name?: string;
+  email?: string;
+}
+
+type UserWithOptionRequired = Required<User>
+// Transforme toutes les valeurs de User en obligatoire
+type UserWithOptionRequired = {
+    id: number;
+    name: string;
+    email: string;
+}
+
+// Voici le type de Required
+type Required<T> = { [P in keyof T]-?: T[P]; }
+// Pour toutes les clefs (P) de l'objet (T) => transforme toutes les valeurs de l'objet avec son type et supprime undefined
+
+```
+
+- NonNullable : Transforme les valeurs non nulles (undefined)
+
+```ts
+
+type role = "admin" | undefined
+
+type roleNonNullable = NonNullable<role>
+// Supprime les undefined du type (mais pas les null)
+type roleNonNullable = "admin"
+
+// Voici le type de NonNullable
+type NonNullable<T> = T & {}
+
+```
+
+- Exclude : Revient à exclure une ou des valeurs
+
+```ts
+
+type T0 = Exclude<"a" | "b" | "c", "a">;
+// On exclue "a" et l'union type qui va avec
+type T0 = "b" | "c";
+
+type T1 = Exclude<"a" | "b" | "c", "a" | "b">;
+// On exlue "a" | "b" il reste "c"
+type T1 = "c";
+
+type T2 = Exclude<string | number | (() => void), Function>;
+// On exclue la fonction donc (() => void), il reste <string | number>
+type T2 = string | number
+
+type Shape =
+  | { kind: "circle"; radius: number }
+  | { kind: "square"; x: number }
+  | { kind: "triangle"; x: number; y: number };
+ 
+type T3 = Exclude<Shape, { kind: "circle" }>
+// On exclue la clef kind avec la valeur circle de l'objet Shape
+type T3 = {
+    kind: "square";
+    x: number;
+} | {
+    kind: "triangle";
+    x: number;
+    y: number;
+}
+
+
+```

@@ -1,0 +1,113 @@
+---
+title: Inférence
+description: L'inférence dans typescript
+---
+
+# Typescript
+---
+## Inférences Typescript
+
+### Variables :
+
+```js caption="..."
+
+ const chien = "Natsu"; // chien est de type Natsu 
+ let chat = "filou"; // chat est de type String
+
+```
+
+### Objets :
+
+```js
+// Le type de dog.name sera "String"
+const dog = { 
+   name: 'Natsu',
+   age: 13
+} 
+```
+ Si on essaye de changer la valeur de name on peut :
+```js
+
+dog.name = 'Rackham' //  name deviendra Rackham
+
+```
+
+- Lorsque c'est une constante la valeur ne pourra pas changer. C'est donc pour celà que le type correspondra à la valeur.
+
+- Dans le cas de let, on peut changer la valeur. Le type correspondra donc à la valeur du type.
+
+- Pour un objet c'est différent car on est capable de changer la valeur de la clef.
+Il faut bien se poser la question à savoir si on peut changer la valeur ou non.
+
+### as :
+
+Le as permet de faire une assertion ou un cast.
+Cela revient à indiquer au transpileur que le type est différent de celui qu'il a déduit.
+
+```ts
+
+   type DogName = "rex" | "rexy";
+
+   let dogName = "rex" as DogName; 
+   
+   // dogName deviendra alors soit rex soit rexy, toutes autres valeurs génèreront une erreur typescript  
+
+```
+
+```ts
+
+   let dogName = "rex" as number;
+   // Ici on aura une erreur  
+   // typescript reconnait une string que tu essayes de transformer en number ça n'est pas possible
+   
+   let dogName = "rex" as number | string;
+   // là il n'y aura pas d'erreur, on pourra même assigner un nombre à dogName.
+   dogName = 1000; // pas d'erreur
+
+```
+
+### as const:
+
+```ts
+
+ const dog = {
+   name: 'Rex',
+   age: 3
+ } as const;
+ // Ici on fait en sorte qu'on ne puisse changer les valeurs en rajoutant as const en les rendant en LECTURE SEULE
+ const dog: {
+    readonly name: "Rex";
+    readonly age: 3;
+}
+ // Donc si on fait : 
+ dog.name = 'Rackham' // Typescript génèrera une erreur
+
+```
+
+### typeof:
+
+typeof permet de passer du monde Javascript en Typescript
+
+Quand tu passes ta souris sur un élément. Il lit ce qui est écrit, et l'ajoute dans une variable.
+
+- On assigne à Dogtype le type de dog
+
+```ts
+
+const dog = {
+  name: 'Rex',
+  age: 3
+}
+
+type DogType = typeof dog; // Dogtype est de type objet
+
+const dog = {
+  name: 'Rex',
+  age: 3
+} as const;
+
+const DogType = typeof dog; // DogType est de type { name: 'Rex', age: 3 }
+
+```
+
+<Button text="my button"/>
