@@ -3,12 +3,10 @@ title: Les types génériques
 description: Les types génériques dans typescript
 ---
 
-## Les types génériques
-
 ### Exemple avec useState
 
+<Pre>
 ```ts 
-
 function useState<T>(initialValue: T): [T, (value: T) => void] {
   let value = initialValue;
   const setValue = (newValue: T) => {
@@ -20,11 +18,10 @@ function useState<T>(initialValue: T): [T, (value: T) => void] {
 const [myName, setMyName] = useState('Melvyn');
 // useState prend une valeur de type string (car Melvyn est une string)
 // <T> devient donc une string et transmet donc string à tout les T
-
 ```
-
+</Pre>
+<Pre>
 ```ts 
-
 type role = "user" | "admin";
 const [role, setRole] = useState<role>('user');
 
@@ -33,17 +30,16 @@ const [role, setRole] = useState<role>('user');
 // <T> deviendra soit user soit admin 
 // Si on fait :
 setRole('test'); // Typescript génèrera une erreur
-
 ```
+</Pre>
 
 ## Les types génériques populaires
 
 ### Utility types
 
 - Omit : Omet la clef voulue de l'objet
-
+<Pre>
 ```ts
-
 type User = {
   id: number;
   name: string;
@@ -57,13 +53,12 @@ type UserWithoutId = {
   email: string;
 }
 // Omit<NomObjet, "clef">
-
 ```
+</Pre>
 
 - Partial : Transforme toutes les valeurs de l'objet en optionnelle
-
+<Pre>
 ```ts
-
 type User = {
   id: number;
   name: string;
@@ -81,13 +76,11 @@ type UserWithOption = {
 // Voici le type de Partial
 type Partial<T> = { [P in keyof T]?: T[P] | undefined; }
 // Pour toutes les clefs (P) de l'objet (T) => transforme toutes les valeurs de l'objet avec le type de la valeur et rajoute undefined
-
 ```
-
+</Pre>
 - Required : Transforme toutes les valeurs de l'objet en obligatoire
-
+<Pre>
 ```ts
-
 type User = {
   id?: number;
   name?: string;
@@ -105,13 +98,11 @@ type UserWithOptionRequired = {
 // Voici le type de Required
 type Required<T> = { [P in keyof T]-?: T[P]; }
 // Pour toutes les clefs (P) de l'objet (T) => transforme toutes les valeurs de l'objet avec son type et supprime undefined
-
 ```
-
+</Pre>
 - NonNullable : Transforme les valeurs non nulles (undefined)
-
+<Pre>
 ```ts
-
 type role = "admin" | undefined
 
 type roleNonNullable = NonNullable<role>
@@ -120,13 +111,11 @@ type roleNonNullable = "admin"
 
 // Voici le type de NonNullable
 type NonNullable<T> = T & {}
-
 ```
-
+</Pre>
 - Exclude : Revient à exclure une ou des valeurs
-
+<Pre>
 ```ts
-
 type T0 = Exclude<"a" | "b" | "c", "a">;
 // On exclue "a" et l'union type qui va avec
 type T0 = "b" | "c";
@@ -154,6 +143,5 @@ type T3 = {
     x: number;
     y: number;
 }
-
-
 ```
+</Pre>

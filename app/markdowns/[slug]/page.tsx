@@ -1,10 +1,10 @@
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
-import css from "./page.module.css";
 import rehypePrettyCode from "rehype-pretty-code";
 import { MDXRemote } from "next-mdx-remote/rsc";
-import Button from "@components/Test/Test"
+import {visit} from "unist-util-visit"
+import { Pre } from "@components/PreComponent/PreComponent";
 
 // app/[...slug]/page.js
 
@@ -37,31 +37,45 @@ export default async function Page({ params }: any) {
   const props = await getPosts(params);
 
   const components = {
-    h1: (props: any) => (
-        <>
-      <h1 {...props} className="large-text">
-        {props.children}
-      </h1>
-      <div>coucou</div>
-      </>
-    ),
-  }
+    Pre,
+  };
 
   return (
-    <article className={css.article}>
-      <h1>{props.fontMatter.title}</h1>
+    <article className="prose md:prose-md lg:prose-lg xl:prose-xl prose-slate !prose-invert mx-auto">
+      <h1 className="">{props.fontMatter.title}</h1>
 
       <MDXRemote
         source={props.content}
-        components={{Button}}
+        components={ components }
         options={{
           mdxOptions: {
             rehypePlugins: [
+              () => (tree) => {
+                visit(tree, (node) => {
+                  // console.log(node?.tagName);
+                  // node permet de voir tout ce que contient le mdx (h1, h3, pre, p...)
+
+                  // On récupère uniquement tout ce qui est de tupe element et pre
+                  if (node?.type === "element" && node?.tagName === "pre") {
+
+                    // On récupère les enfants de pre avec leurs propriétés (donc code)
+                    const [codeEl] = node.children;
+                    
+                    if (codeEl.tagName !== "code") return;
+
+                    // On renvoie les informations dans les props de children (pre)
+                    node.properties = node.properties || {};
+                    node.properties.raw = codeEl.children?.[0].value;
+                    node.properties.lang = codeEl.properties.className?.[0].split("-")?.[1];
+                    
+                  }
+                });
+              },
               [
                 rehypePrettyCode as any,
                 {
                   defaultLang: "plaintext",
-                  // keepBackground: false,
+                  keepBackground: false,
                   theme: JSON.parse(
                     fs.readFileSync(
                       path.join("app", "themes", "moonlight-ii.json"),
@@ -70,6 +84,14 @@ export default async function Page({ params }: any) {
                   ),
                 },
               ],
+              // () => (tree) => {
+              //   visit(tree, 'element', (node) => {
+              //     if (node?.type === 'element' && node?.tagName === 'pre') {
+              //       node.properties['raw'] = node.raw
+              //       console.log(node) //here to see if you're getting the raw text
+              //     }
+              //   })
+              // },
             ],
           },
         }}

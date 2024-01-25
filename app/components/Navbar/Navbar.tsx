@@ -1,26 +1,24 @@
-import css from "./NavBar.module.css";
 import Link from "next/link";
 import Image from "next/image";
 
 const Navbar = () => {
     return (
-        <nav className={css.navbar}>
-        <div className={css.logo}>
-            <Image className={css.logo__img} src="/natsu2.png" alt="Natsu" width={50} height={50}></Image>
+        <nav className="flex items-center bg-black h-20 text-md">
+        <div className="grow-[0.5]">
+            <Image className="rounded-full" src="/natsu2.png" alt="Natsu" width={50} height={50}></Image>
         </div>
-        <p className={css.title}>ice&apos;s Revision Directory</p>
-        <ul className={css.list}>
-          <li className={css.list__item}>
+        <p className="grow-[1.5] font-sacramento">ice&apos;s Revision Directory</p>
+        <ul className="grow-[6] flex justify-around items-center m-0 h-full font-inter">
+          <li>
             <Link
               href="typescript"
             >
             Typescript
             </Link>
           </li>
-          <li className={css.list__item}>
+          <li className="">
             <Link
               href="/#skills"
-              scroll={false}
             >
             NextJs
             </Link>
