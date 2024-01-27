@@ -10,7 +10,7 @@ export const Pre = ({ children }: PreProps) => {
   const lang = children?.props.lang;
 
   return (
-    <pre className="p-l bg-black">
+    <pre className="rounded-md bg-black">
       <div className="">
         <CopyButton text={raw} lang={lang}/>
       </div>
