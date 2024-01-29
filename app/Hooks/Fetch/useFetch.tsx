@@ -1,13 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
-export const useFetch = <T,>(
-  folder: string,
-): {
-  data: T | undefined;
-} => {
+export const useFetch = <T,>(folder: string): { data: T | undefined } => {
   const [data, setData] = useState<T | undefined>(undefined);
 
-  const fetchDatas = async (): Promise<void> => {
+  const fetchDatas = useCallback(async () => {
     try {
       const res = await (
         await fetch(`http://localhost:3000/api/listLessons?folder=${folder}`)
@@ -17,11 +13,11 @@ export const useFetch = <T,>(
     } catch (e: any) {
       console.error(e);
     }
-  };
+  }, [folder]);
 
   useEffect(() => {
     fetchDatas();
-  }, []);
+  }, [fetchDatas]);
 
   return { data };
 };
