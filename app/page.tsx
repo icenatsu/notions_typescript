@@ -8,12 +8,16 @@ export type lessonName = 'typescript' | 'next' | ''
 const Home = () => {
 
   const [lesson, setLesson] = useState<lessonName>('')
-    console.log(lesson);
-    
+
+    const handleClickCategoryLessons = (lesson: lessonName) => {
+      setLesson(lesson)
+    };
+
   return (
     <>
-      <Navbar lesson={lesson} setLesson={setLesson}/>
-      {lesson === "typescript" && <ListLessons/>}
+      <Navbar lesson={lesson} handleClickCategoryLessons={handleClickCategoryLessons}/>
+      {lesson === "typescript" && <ListLessons lesson={lesson}/>}
+      {lesson === "next" && <ListLessons lesson={lesson}/>}
     </>
   );
 };

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { useFetch } from "@Hooks/Fetch/useFetch";
+import { lessonName } from "@/app/page";
 
 type Markdown = {
   meta: {
@@ -8,20 +9,24 @@ type Markdown = {
   slug: string;
 }
 
-const ListLessons = () => {
+type listLessonProps = {
+  lesson : lessonName
+}
 
-  const { data } = useFetch<Markdown[]>('typescript')
+const ListLessons = ({lesson}: listLessonProps) => {
+
+  const { data } = useFetch<Markdown[]>(lesson)
 
   return (
     <div className="flex flex-col gap-10">
-      <h1 className="m-4 text-jade11">Typescript</h1>
+      <h1 className="m-4 text-jade11">{lesson.charAt(0).toUpperCase() + lesson.substring(1)}</h1>
       <section className="">
         <h2 className="m-5 text-jade12">Catégories</h2>
 
         <div className="flex gap-4 m-4">
           {data?.map((markdown) => (
             <Link
-              href={`/markdowns/${markdown.slug}`}
+              href={`/markdowns/typescript/${markdown.slug}`}
               passHref
               key={markdown.slug}
             >

@@ -7,10 +7,11 @@ import { lessonName } from "@/app/page";
 
 type NavbarProps = {
   lesson: lessonName,
-  setLesson: Dispatch<SetStateAction<lessonName>>
+  handleClickCategoryLessons: (arg0: lessonName) => void
 }
 
-const Navbar = ({lesson, setLesson}: NavbarProps) => {
+const Navbar = ({lesson, handleClickCategoryLessons}: NavbarProps) => {
+
   const [showMenu, setShowMenu] = useState<boolean>(false);
 
   // Déroulement de la navbar en version mobile et tablette
@@ -18,8 +19,13 @@ const Navbar = ({lesson, setLesson}: NavbarProps) => {
     setShowMenu(!showMenu);
   };
   
+
   const handleClickTypescriptLessons = () => {
-    setLesson('typescript')
+    handleClickCategoryLessons('typescript')
+  };
+
+  const handleClickNextLessons = () => {
+    handleClickCategoryLessons('next')
   };
 
   return (
@@ -40,8 +46,8 @@ const Navbar = ({lesson, setLesson}: NavbarProps) => {
         <li className="cursor-pointer" onClick={handleClickTypescriptLessons}>
           Typescript
         </li>
-        <li className="">
-          <Link href="/#skills">NextJs</Link>
+        <li className="cursor-pointer" onClick={handleClickNextLessons}>
+          NextJs
         </li>
       </ul>
       <div

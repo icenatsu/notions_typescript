@@ -6,22 +6,31 @@ import { MDXRemote } from "next-mdx-remote/rsc";
 import {visit} from "unist-util-visit"
 import { Pre } from "@components/PreComponent/PreComponent";
 
-// app/[...slug]/page.js
 
+ 
 // generateStaticParams remplace la fonction getStaticPaths et getStaticProps dans App router
 export async function generateStaticParams() {
-  const files = fs.readdirSync(path.join("markdowns"));
+  const mdDir = fs.readdirSync(path.join("markdowns"));
 
-  const paths = files.map((filename) => ({
-    slug: filename.replace(".mdx", ""),
-  }));
-
-  return paths;
+  const paths = mdDir.flatMap((dir) => {
+    const files = fs.readdirSync(path.join("markdowns", dir));
+  
+    return files.map((filename) => ({
+      category: dir, // Catégorie représente le lien après /markdowns/[category]/
+      slug: filename.replace(".mdx", ""), // Slug représente le lien après /markdowns/[category]/[slug]
+    }));
+  });
+  return paths
 }
 
-async function getPosts({ slug }: { slug: string }) {
+type test = {
+  category: string,
+  slug: string
+}
+
+async function getPosts({ category, slug }: test) {  
   const markdownFile = fs.readFileSync(
-    path.join("markdowns", slug + ".mdx"),
+    path.join("markdowns", category, slug + ".mdx"),
     "utf-8"
   );
 
@@ -34,6 +43,8 @@ async function getPosts({ slug }: { slug: string }) {
 }
 
 export default async function Page({ params }: any) {
+
+  
   const props = await getPosts(params);
 
   const components = {
