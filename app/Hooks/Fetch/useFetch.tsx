@@ -12,7 +12,7 @@ export const useFetch = <T,>(folder: string): { data: T | undefined } => {
 
       setData(res);
     } catch (e: any) {
-      console.error(e);
+      throw {e}
     }
   }, [folder]);
 
