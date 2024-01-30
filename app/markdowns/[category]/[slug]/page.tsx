@@ -4,22 +4,22 @@ import matter from "gray-matter";
 import rehypePrettyCode from "rehype-pretty-code";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import {visit} from "unist-util-visit"
-import { Pre } from "@components/PreComponent/PreComponent";
+import { Pre } from "@components/PreComponent";
 
-
- 
 // generateStaticParams remplace la fonction getStaticPaths et getStaticProps dans App router
 export async function generateStaticParams() {
   const mdDir = fs.readdirSync(path.join("markdowns"));
 
   const paths = mdDir.flatMap((dir) => {
-    const files = fs.readdirSync(path.join("markdowns", dir));
+    const files = fs.readdirSync(path.join("markdowns", dir));    
+
   
-    return files.map((filename) => ({
+    return files.map((filename) => ({      
       category: dir, // Catégorie représente le lien après /markdowns/[category]/
       slug: filename.replace(".mdx", ""), // Slug représente le lien après /markdowns/[category]/[slug]
     }));
   });
+  
   return paths
 }
 
@@ -29,6 +29,7 @@ type test = {
 }
 
 async function getPosts({ category, slug }: test) {  
+  
   const markdownFile = fs.readFileSync(
     path.join("markdowns", category, slug + ".mdx"),
     "utf-8"

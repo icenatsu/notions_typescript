@@ -1,23 +1,22 @@
 "use client";
-import Navbar from "@components/Navbar/Navbar";
-import ListLessons from "@components/ListLessons/ListLessons";
+import Navbar from "@components/Navbar";
+import ListLessons from "@components/ListLessons";
 import { useState } from "react";
 
-export type lessonName = 'typescript' | 'next' | ''
+export type lessonName = "typescript" | "next" | "";
 
 const Home = () => {
+  const [lesson, setLesson] = useState<lessonName>("");
 
-  const [lesson, setLesson] = useState<lessonName>('')
-
-    const handleClickCategoryLessons = (lesson: lessonName) => {
-      setLesson(lesson)
-    };
+  const handleClickCategoryLessons = (lesson: lessonName) => {
+    setLesson(lesson);
+  };
 
   return (
     <>
-      <Navbar lesson={lesson} handleClickCategoryLessons={handleClickCategoryLessons}/>
-      {lesson === "typescript" && <ListLessons lesson={lesson}/>}
-      {lesson === "next" && <ListLessons lesson={lesson}/>}
+      <Navbar handleClickCategoryLessons={handleClickCategoryLessons} />
+      {lesson === "typescript" && <ListLessons lesson={lesson} />}
+      {lesson === "next" && <ListLessons lesson={lesson} />}
     </>
   );
 };

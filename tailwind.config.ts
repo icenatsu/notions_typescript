@@ -8,10 +8,10 @@ const config: Config = {
   ],
   theme: {
     screens: {
-        sm: '480px',
-        md: '768px',
-        lg: '976px',
-        xl: '1440px',
+        sm: '0px', // = ou + à 300px
+        md: '640px',
+        lg: '768px',
+        xl: '1024px',
     },
     extend: {
       fontFamily: {
@@ -19,6 +19,7 @@ const config: Config = {
         "inter": "var(--font--inter)",
       },
       colors: {
+        transparent: 'transparent',
         jade1: '#0d1512',
         jade2: '#121c18',
         jade3: '#0f2e22',

@@ -7,26 +7,27 @@ type Markdown = {
     title: string;
   };
   slug: string;
-}
+};
 
 type listLessonProps = {
-  lesson : lessonName
-}
+  lesson: lessonName;
+};
 
-const ListLessons = ({lesson}: listLessonProps) => {
-
-  const { data } = useFetch<Markdown[]>(lesson)
+const ListLessons = ({ lesson }: listLessonProps) => {
+  const { data } = useFetch<Markdown[]>(lesson);
 
   return (
     <div className="flex flex-col gap-10">
-      <h1 className="m-4 text-jade11">{lesson.charAt(0).toUpperCase() + lesson.substring(1)}</h1>
+      <h1 className="m-4 text-jade11">
+        {lesson.charAt(0).toUpperCase() + lesson.substring(1)}
+      </h1>
       <section className="">
         <h2 className="m-5 text-jade12">Catégories</h2>
 
-        <div className="flex gap-4 m-4">
+        <div className="m-4 flex gap-4 sm:flex sm:flex-col">
           {data?.map((markdown) => (
             <Link
-              href={`/markdowns/typescript/${markdown.slug}`}
+              href={`/markdowns/${lesson}/${markdown.slug}`}
               passHref
               key={markdown.slug}
             >
@@ -39,6 +40,6 @@ const ListLessons = ({lesson}: listLessonProps) => {
       </section>
     </div>
   );
-}
+};
 
 export default ListLessons;

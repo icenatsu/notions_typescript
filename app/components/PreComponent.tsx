@@ -1,4 +1,4 @@
-import { CopyButton } from "@components/CopyButton/CopyButton";
+import { CopyButton } from "@components/CopyButton";
 
 type PreProps = {
   children: React.ReactElement<{ raw: string, lang: string }>; // Définir le type de children
