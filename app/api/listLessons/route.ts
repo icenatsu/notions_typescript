@@ -8,6 +8,7 @@ export const GET = async (req: NextRequest) => {
   try {
       const folder = req.nextUrl.searchParams.get("folder")
       
+
       const blogDir = `markdowns/${folder}/`;
       const files = fs.readdirSync(path.join(blogDir));
         
