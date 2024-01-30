@@ -24,14 +24,14 @@ const ListLessons = ({ lesson }: listLessonProps) => {
       <section className="">
         <h2 className="m-5 text-jade12">Catégories</h2>
 
-        <div className="m-4 flex gap-4 sm:flex sm:flex-col">
+        <div className="m-4 flex flex-col md:flex md:flex-row gap-4 mt-10">
           {data?.map((markdown) => (
             <Link
               href={`/markdowns/${lesson}/${markdown.slug}`}
               passHref
               key={markdown.slug}
             >
-              <div className="flex items-center justify-center rounded-lg border border-solid border-jade6 bg-jade2 p-4 text-jade7 hover:border-jade8 hover:text-jade8">
+              <div className="flex items-center justify-center rounded-lg border border-solid border-jade6 bg-jade3 p-4 text-jade11 hover:border-jade7 hover:text-jade12 hover:bg-jade4">
                 {markdown.meta.title}
               </div>
             </Link>

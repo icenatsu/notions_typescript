@@ -19,13 +19,13 @@ const NavLinks = ({ closeMenu, handleClickCategoryLessons }: NavLinksProps) => {
   return (
     <>
       <li
-        className="menu-link cursor-pointer p-2 sm:w-full sm:hover:bg-jade4 md:p-0 md:hover:bg-transparent"
+        className="cursor-pointer p-2 sm:w-full sm:hover:bg-jade4 md:p-0 md:hover:bg-transparent md:w-4"
         onClick={handleClickTypescriptLessons}
       >
         Typescript
       </li>
       <li
-        className="menu-link cursor-pointer p-2 sm:w-full sm:hover:bg-jade4 md:p-0 md:hover:bg-transparent"
+        className="cursor-pointer p-2 sm:w-full sm:hover:bg-jade4 md:p-0 md:hover:bg-transparent md:w-4"
         onClick={handleClickNextLessons}
       >
         NextJs
