@@ -51,7 +51,7 @@ const Navbar = ({ handleClickCategoryLessons }: NavbarProps) => {
         </div>
       </nav>
       {showMenu && (
-        <ul className="hover:opacity-50 flex basis-full flex-col items-center bg-jade3 md:hidden">
+        <ul className="flex basis-full flex-col items-center bg-jade3 md:hidden">
           <NavLinks
             closeMenu={handleClickCloseMenu}
             handleClickCategoryLessons={handleClickCategoryLessons}
