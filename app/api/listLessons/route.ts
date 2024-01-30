@@ -10,9 +10,7 @@ export const GET = async (req: NextRequest) => {
       
 
       const blogDir = `markdowns/${folder}/`;
-      const files = fs.readdirSync(path.join(process.cwd(),blogDir));
-      console.log(files);
-      
+      const files = fs.readdirSync(path.join(process.cwd(), blogDir));
         
       const markdowns = files.map((filename) => {
         const fileContent = fs.readFileSync(path.join(blogDir, filename), "utf-8");
