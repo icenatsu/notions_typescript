@@ -6,7 +6,7 @@ export const useFetch = <T,>(folder: string): { data: T | undefined } => {
   const fetchDatas = useCallback(async () => {
     try {
       const res = await (
-        await fetch(`http://localhost:3000/api/listLessons?folder=${folder}`)
+        await fetch(`${process.env.API_URL}/api/listLessons?folder=${folder}`)
       ).json();
 
       setData(res);
