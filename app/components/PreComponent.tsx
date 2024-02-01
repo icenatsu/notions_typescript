@@ -14,7 +14,6 @@ export const Pre = ({ children }: PreProps) => {
       <div className="">
         <CopyButton text={raw} lang={lang}/>
       </div>
-
       {children}
     </pre>
   );

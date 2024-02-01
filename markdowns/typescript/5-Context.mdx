@@ -1,0 +1,127 @@
+---
+title: Context
+description: Context en typescript
+---
+
+### Context
+
+- Exemple de contexte avec un theme
+
+<Pre>
+```tsx
+import { createContext, useState, PropsWithChildren } from 'react'
+
+type Theme = 'light' | 'dark'
+
+type ThemeContextInput = {
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
+  toggle: () => void;
+}
+
+const ThemeContext = createContext<ThemeContextInput | null>(null);
+
+const ThemeProvider = ({ children }: PropsWithChildren) => {
+  const [theme, setTheme] = useState<Theme>('light')
+
+  const toggle = () => {
+    setTheme(theme === 'light' ? 'dark' : 'light')
+  }
+
+  const value = { 
+    theme,
+    setTheme,
+    toggle,
+  }
+
+  return (
+    // `value` doit correspondre à `ThemeContext`
+    <ThemeContext.Provider value={value}>
+      {children}
+    </ThemeContext.Provider>
+  )
+}
+
+const useTheme = () => {
+  const context = useContext(ThemeContext)
+
+  if (context === null) {
+    throw new Error('useTheme must be used within a ThemeProvider')
+  }
+
+  // On est sûr que context n'est pas null -> `useContext` est sécurisé ✅
+  // Ce qui nous permettera de ne pas avoir besoin de faire des vérifications
+  return context 
+}
+```
+</Pre>
+
+- Exemple de contexte avec une connexion, deconnexion, update
+  - Utilisation de l'utility type Partial qui est utile pour un update
+  - Partial Permet de rendre toutes les valeurs optionnelles ce qui va permettre de ne pouvoir update uniquement ce que l'on souhaite 
+
+
+<Pre>
+```tsx
+import { createContext, PropsWithChildren, useContext, useState } from 'react';
+
+type User = {
+  id: string;
+  name: string;
+  email: string;
+};
+
+type UserContextValue = {
+  user: User | null;
+  disconnect: () => void;
+  connect: (user: User) => void;
+  update: (user: Partial<User>) => void;
+};
+
+const UserContext = createContext<UserContextValue | null>(null);
+
+export const UserProvider = ({ children }: PropsWithChildren) => {
+  const [user, setUser] = useState<User | null>(null);
+
+  const connect = (user: User) => {
+    setUser(user)
+  }
+
+  const disconnect = () => {
+    setUser(null);
+  };
+
+  const update = (user: Partial<User>) => {
+    setUser((curr) => {
+      if(!curr){
+        return curr
+      }
+
+      return {
+        ...curr, // on récupère une copie de curr
+        ...user // on récupère une copie de user et on AJOUTE les propriétées que curr ne contient pas ou ECRASE les propriétés correspondantes
+      }
+    })
+  }
+
+  const values: UserContextValue = {
+    user,
+    disconnect,
+    connect,
+    update,
+  };
+
+  return <UserContext.Provider value={values}>{children}</UserContext.Provider>;
+};
+
+export const useUser = () => {
+  const context = useContext(UserContext);
+
+  if (context === null) {
+    throw new Error('useUser must be used within a UserProvider');
+  }
+
+  return context;
+};
+```
+</Pre>

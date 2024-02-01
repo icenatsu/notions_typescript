@@ -4,7 +4,8 @@ import matter from "gray-matter";
 import rehypePrettyCode from "rehype-pretty-code";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import {visit} from "unist-util-visit"
-import { Pre } from "@components/PreComponent";
+import {Pre} from "@components/PreComponent";
+import {ColoredHeading} from "@components/CustomComponentsMdx/ColoredHeading";
 
 // generateStaticParams remplace la fonction getStaticPaths et getStaticProps dans App router
 export async function generateStaticParams() {
@@ -23,12 +24,12 @@ export async function generateStaticParams() {
   return paths
 }
 
-type test = {
+type getLessonsProps = {
   category: string,
   slug: string
 }
 
-async function getPosts({ category, slug }: test) {  
+async function getLessons({ category, slug }: getLessonsProps) {  
   
   const markdownFile = fs.readFileSync(
     path.join("markdowns", category, slug + ".mdx"),
@@ -46,19 +47,20 @@ async function getPosts({ category, slug }: test) {
 export default async function Page({ params }: any) {
 
   
-  const props = await getPosts(params);
+  const props = await getLessons(params);
 
   const components = {
     Pre,
+    ColoredHeading
   };
 
   return (
-    <article className="prose md:prose-md lg:prose-lg xl:prose-xl prose-slate !prose-invert mx-auto">
-      <h1 className="">{props.fontMatter.title}</h1>
+    <article className="prose md:prose-md lg:prose-lg prose-slate !prose-invert mx-auto">
+      <h1 className="text-jade11">{props.fontMatter.title}</h1>
 
       <MDXRemote
         source={props.content}
-        components={ components }
+        components={components }
         options={{
           mdxOptions: {
             rehypePlugins: [
@@ -67,7 +69,7 @@ export default async function Page({ params }: any) {
                   // console.log(node?.tagName);
                   // node permet de voir tout ce que contient le mdx (h1, h3, pre, p...)
 
-                  // On récupère uniquement tout ce qui est de tupe element et pre
+                  // On récupère uniquement tout ce qui est de type element et pre
                   if (node?.type === "element" && node?.tagName === "pre") {
 
                     // On récupère les enfants de pre avec leurs propriétés (donc code)

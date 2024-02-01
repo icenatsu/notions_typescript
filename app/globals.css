@@ -50,9 +50,9 @@ body {
   box-sizing: border-box;
 }
 
-/* code {
-  padding: 1rem;
-} */
+code {
+  background-color: white
+}
  
 span {
   white-space: pre-wrap;

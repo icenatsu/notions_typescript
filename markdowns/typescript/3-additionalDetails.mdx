@@ -1,0 +1,115 @@
+---
+title: Détails supplémentaires
+description: keyOf, Récupérer la valeur d'un type, |- Union, &-merge
+---
+
+### keyof
+
+- Récupérer les clefs d'un type "object"
+
+<Pre>
+```ts
+type Chien = {
+  name: string;
+  age: number;
+}
+
+type ChienKeys = keyof Chien; // 'name' | 'age'
+
+const Numbers = [1, 2, 3] as const;
+// On passe la valeur de Numbers Lecture seule
+const Numbers: readonly [1, 2, 3]
+
+// On récupère les clefs de chaque type (index)
+type NumbersKeys = keyof typeof Numbers; // 0 | 1 | 2
+```
+</Pre>
+
+- Récupérer la valeur d'un type
+
+<Pre>
+```ts
+type Chien = {
+    name: string;
+    age: number;
+  }
+  
+type ChienName = Chien["name"]; // string
+  
+const chienNameVariable: ChienName = "Natsu"; // Affiche "Natsu"
+
+// Equivalent en JavaScript
+const Chien = {
+  name: 'Natsu',
+  age: 13,
+}
+const ChienObjectName = ChienObject.name; // "Natsu"
+```
+</Pre>
+
+### UnionType : |
+
+<Pre>
+```ts
+type First3Letter = 'a' | 'b' | 'c';
+type First4Number = 0 | 1 | 2 | 3;
+
+type User = {
+  name: string;
+  age: number;
+  admin: false; // On définit false, soit un type littéral
+}
+
+type AdminUser = {
+  name: string;
+  age: number;
+  admin: true; // On définit true, soit un type littéral
+  permissions: string[]; // Si c'est true, alors il y a un tableau de string `permissions`
+}
+
+const isAuthorized = (user: User | AdminUser) => {
+  if (user.admin) {
+    // Ici on est sûr que user est un AdminUser
+    // On peut donc accéder à la propriété `permissions`
+    user.permissions
+  }
+
+  user.permissions // Erreur, car `permissions` n'existe pas sur User
+}
+
+```
+</Pre>
+
+### Merge : &
+
+<Pre>
+```ts
+type UserBase = {
+  name: string;
+  age: number;
+}
+
+type User = {
+  admin: false;
+} & UserBase; // On ajoute UserBase à User
+
+type UserAdmin = {
+  admin: true;
+  permissions: string[];
+} & UserBase; // On ajoute UserBase à UserAdmin
+
+type ButtonProps = {
+  color: string;
+  onClick: () => void;
+}
+
+type ButtonWithIconProps = {
+  icon: string;
+} & ButtonProps; // On ajoute ButtonProps à ButtonWithIconProps
+
+const Button = (props: ButtonProps) => /**... */
+
+const ButtonWithIcon = (props: ButtonWithIconProps) => /**... */
+
+```
+</Pre>

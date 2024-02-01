@@ -23,7 +23,7 @@ const Navbar = ({ handleClickCategoryLessons }: NavbarProps) => {
 
   return (
     <>
-      <nav className="relative flex h-20 items-center bg-black">
+      <nav className="relative flex h-14 items-center bg-jade9 border-b-2 border-b-jade7">
         <div className="grow-[0.1] p-4">
           <Image
             className="rounded-full"

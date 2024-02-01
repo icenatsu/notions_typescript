@@ -2,8 +2,9 @@
 import Navbar from "@components/Navbar";
 import ListLessons from "@components/ListLessons";
 import { useState } from "react";
+// import Test from "@/test";
 
-export type lessonName = "typescript" | "next" | "";
+export type lessonName = "typescript" | "next" | "fetch" | "";
 
 const Home = () => {
   const [lesson, setLesson] = useState<lessonName>("");
@@ -14,9 +15,18 @@ const Home = () => {
 
   return (
     <>
-      <Navbar handleClickCategoryLessons={handleClickCategoryLessons} />
-      {lesson === "typescript" && <ListLessons lesson={lesson} />}
-      {lesson === "next" && <ListLessons lesson={lesson} />}
+      <header>
+        <Navbar handleClickCategoryLessons={handleClickCategoryLessons} />
+      </header>
+      <main>
+        {lesson === "typescript" && <ListLessons lesson={lesson} />}
+        {lesson === "next" && <ListLessons lesson={lesson} />}
+        {lesson === "fetch" && <ListLessons lesson={lesson} />}
+        {/* <Test/> */}
+      </main>
+      <footer className="text-center w-full text-sm fixed bottom-0">
+        @Design by ice
+      </footer>
     </>
   );
 };

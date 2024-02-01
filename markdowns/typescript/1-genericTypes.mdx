@@ -1,12 +1,14 @@
 ---
 title: Les types génériques
-description: Les types génériques dans typescript
+description: Les types génériques et Utility types
 ---
 
 ### Exemple avec useState
 
+- Pour useState on définit le type lorsqu'il peut être multiple, si l'inférence est correcte on ne définit pas.
+
 <Pre>
-```ts 
+```tsx 
 function useState<T>(initialValue: T): [T, (value: T) => void] {
   let value = initialValue;
   const setValue = (newValue: T) => {

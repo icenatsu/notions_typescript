@@ -1,0 +1,72 @@
+---
+title: Typescript et les composants React
+description: children, props optionnelles, ComponentPropsWithoutRef
+---
+
+### children
+
+<Pre>
+```tsx
+import { ReactNode } from "react"
+
+type AvatarProps = {
+  username: string;
+  avatarUrl: string;
+  children: ReactNode
+};
+
+const Avatar = ({username, avatarUrl, children}: AvatarProps) => {
+}
+```
+</Pre>
+
+### PropsWithChildren
+
+<Pre>
+```tsx
+import { PropsWithChildren } from 'react';
+
+type AvatarProps = {
+  username: string;
+  avatarUrl: string;
+};
+
+const Avatar = ({ username, avatarUrl, children}: PropsWithChildren<AvatarProps>) => {
+}
+```
+</Pre>
+
+### Props optionnelles
+
+<Pre>
+```ts
+type AvatarVariant = 'primary' | 'secondary';
+
+type AvatarProps = {
+  username: string;
+  avatarUrl: string;
+  variant?: AvatarVariant;
+};
+
+// On rajoute ? derrière la props si on en a pas besoin dans tous les composants dans lesuquels on l'utilise.
+```
+</Pre>
+
+### ComponentPropsWithoutRef
+
+<Pre>
+```ts
+type ButtonProps = {
+  disabled?: boolean;
+  className?: string;
+  onClick?: (event: MouseEvent) => void;
+  // ... les 300 autres propriétés
+}
+
+// ComponentPropsWithoutRef<HTMLElement> rajoute toutes les propriétés propres à l'élément, il rajoute également children
+type ButtonProps = {
+  disabled?: boolean;
+  className?: string;
+} & ComponentPropsWithoutRef<"button">
+```
+</Pre>

@@ -7,9 +7,10 @@ export const GET = async (req: NextRequest) => {
 
   try {
       const folder = req.nextUrl.searchParams.get("folder")
-      
 
-      const blogDir = `markdowns/${folder}/`;
+      const folderDecode = decodeURIComponent(folder as string)
+    
+      const blogDir = `markdowns/${folderDecode}/`;
       const files = fs.readdirSync(path.join(process.cwd(), blogDir));
         
       const markdowns = files.map((filename) => {

@@ -16,16 +16,27 @@ const NavLinks = ({ closeMenu, handleClickCategoryLessons }: NavLinksProps) => {
     closeMenu();
   };
 
+  const handleClickFetchLessons = () => {
+    handleClickCategoryLessons("fetch");
+    closeMenu();
+  };
+
   return (
     <>
       <li
-        className="cursor-pointer p-2 sm:w-full sm:hover:bg-jade4 md:p-0 md:hover:bg-transparent md:w-4"
+        className="cursor-pointer p-2 text-base font-bold sm:w-full sm:hover:bg-jade4 md:w-4 md:p-0 md:hover:bg-transparent"
         onClick={handleClickTypescriptLessons}
       >
         Typescript
       </li>
       <li
-        className="cursor-pointer p-2 sm:w-full sm:hover:bg-jade4 md:p-0 md:hover:bg-transparent md:w-4"
+        className="cursor-pointer p-2 text-base font-bold sm:w-full sm:hover:bg-jade4 md:w-4 md:p-0 md:hover:bg-transparent"
+        onClick={handleClickFetchLessons}
+      >
+        Fetch
+      </li>
+      <li
+        className="cursor-pointer p-2 text-base font-bold sm:w-full sm:hover:bg-jade4 md:w-4 md:p-0 md:hover:bg-transparent"
         onClick={handleClickNextLessons}
       >
         NextJs
