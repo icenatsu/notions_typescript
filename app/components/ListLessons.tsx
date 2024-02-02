@@ -2,15 +2,13 @@ import Link from "next/link";
 import { useFetch } from "@Hooks/Fetch/useFetch";
 import { lessonName } from "@/app/page";
 import { Icon } from "@iconify/react";
-import { LessonsResponse } from "@Hooks/Fetch/useFetch"
-
 
 type listLessonProps = {
   lesson: lessonName;
 };
 
 const ListLessons = ({ lesson }: listLessonProps) => {
-  const { data } = useFetch<LessonsResponse>(lesson);
+  const { data } = useFetch(lesson);
 
   return (
     <div className="flex flex-col items-center justify-center xl:flex-row">
@@ -32,12 +30,11 @@ const ListLessons = ({ lesson }: listLessonProps) => {
           <h2 className="m-5 text-jade12">Catégories</h2>
 
           <div className="m-4 mt-10 flex flex-col gap-4">
-            {data?.map((markdown) => (
-              <>
+            {data?.map((markdown, idx) => (
                 <Link
+                  key={markdown.slug}
                   href={`/markdowns/${lesson}/${markdown.slug}`}
                   passHref
-                  key={markdown.slug}
                 >
                   <div className="flex flex-col items-center xl:flex-row">
                     <div className="flex min-w-full items-center justify-center rounded-lg border border-solid border-jade6 bg-jade3 p-4 text-jade11 hover:border-jade7 hover:bg-jade4 hover:text-jade12 xl:min-w-[400px]">
@@ -48,7 +45,6 @@ const ListLessons = ({ lesson }: listLessonProps) => {
                     </div>
                   </div>
                 </Link>
-              </>
             ))}
           </div>
         </section>
