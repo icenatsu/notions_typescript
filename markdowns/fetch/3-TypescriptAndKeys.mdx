@@ -1,0 +1,59 @@
+---
+title: Typescript et les clefs
+description: Centraliser les données
+---
+
+### Les clefs
+
+- useQuery prend en paramètre queryKey qui est juste un tableau avec une string et des variables.
+- Si un développeur oublie un s à users : boom, ton app ne fonctionne plus correctement !
+- Avec ces solutions on va pouvoir centraliser les données
+
+Les solutions :
+
+<Pre>
+```tsx
+// Constante qui correspond à la variable
+const USERS_KEY = 'users';
+
+const { data } = useQuery({
+  queryKey: [USERS_KEY],
+  queryFn: getUsers,
+});
+
+// Custom factorie
+const usersKeys = {
+  all: ["users"], // Pour l'url https://api.com/users
+  byId: (id: string) => ["user", id], // Pour l'url https://api.com/users/12
+  byIdBooks: (id: string) => ["user", id, "books"] // Pour l'url https://api.com/users/12/books
+}
+
+// Librairie Query key factorie
+export const usersKeys = createQueryKeys('users', {
+  byId: (userId: number) => ({ userId }),
+})
+
+const { data: users } = useQuery({
+  queryKey: usersKeys.query(),
+  queryFn: getUsers,
+});
+
+const { data: user } = useQuery({
+  queryKey: usersKeys.byId(1),
+  queryFn: getUser,
+});
+```
+</Pre>
+
+Clean code avec custom Hook
+
+<Pre>
+```ts
+const useUsers = () => useQuery({
+  queryKey: ['users'],
+  queryFn: getUsers,
+});
+
+const { ... } = useUsers();
+```
+</Pre>

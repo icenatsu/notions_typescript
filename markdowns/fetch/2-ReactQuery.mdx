@@ -15,6 +15,7 @@ Voici à quoi va te servir useQuery :
 
 - L'avantage de useQuery c'est qu'il va mettre les données en 'cache' lorsqu'elles seront récupérées une première fois à l'api
 - La seconde ou les fois suivantes ou ces mêmes données seront rappelées par le même composant ou un autre cela évitera de faire la requête à nouveau.
+- Avec un useEffect on va avoir un appel constant à l'API a chaque fois que le ou les composants se remontent. C'est pour cela que ce n'est pas une bonne pratique
 
 ![useQuerySheme](/useQuery.PNG)
 
@@ -64,3 +65,109 @@ const {
 
 isLoading est devenu isPending dans la version 5
 ![useQuerySheme](/isLoading_isFetching.PNG)
+
+### Exemple
+
+- Query Client et Query Provider
+
+<Pre>
+```tsx
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Header } from "./Header";
+
+// On définit les options de la requête avec le Query Client
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+      refetchOnWindowFocus: false
+    }
+  }
+});
+
+// On wrappe le ou les composants avec le Query Provider
+export default function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <Header />
+    </QueryClientProvider>
+  );
+}
+```
+</Pre>
+
+- fetch
+
+<Pre>
+```tsx
+import { z } from "zod";
+
+// on définit le schéma avec Zod
+const UserScheme = z.object({
+  id: z.number(),
+  name: z.string(),
+  username: z.string()
+});
+
+// On extrait le type
+export type User = z.infer<typeof UserScheme>;
+
+// On fait appel à l'api et on retourne le schéma de la réponse vérifié avec parse (zod)
+export const fetchUser = async () => {
+  await new Promise((r) => setTimeout(r, 1000));
+
+  return fetch("https://jsonplaceholder.typicode.com/users/1")
+    .then((res) => res.json())
+    .then((json) => UserScheme.parse(json));
+};
+```
+</Pre>
+
+- Composant wrappé
+
+<Pre>
+```tsx
+import { fetchUser, User } from "./fetchUser";
+import { useQuery } from "@tanstack/react-query";
+
+export const Header = () => {
+  
+  const { data, isLoading, isFetching, error, isError } = useQuery({ 
+  queryKey: ['user', 1], // clef + index
+  queryFn: async () => fetchUser() // la fonction qui va retourner les données
+})
+
+  // On ne doit surtout pas oublier les conditions avec isLoading et isError
+   if(isLoading){
+    return 'Loading....'
+  }
+
+  if(isError){
+    return 'Error'
+  }
+  
+  // On attribut les données à user
+  user = data
+  
+  return (
+    <div className="header">
+      <button>{user.username}</button>
+    </div>
+  );
+};
+```
+</Pre>
+
+### Prefetch : précharger les données
+
+<Pre>
+```js
+const queryClient = useQueryClient()
+
+const prefetchTask = (taskId) => {
+  // Prefetching single task based on its ID
+  queryClient.prefetchQuery({ queryKey: ['tasks', taskId], queryFn: fetchTaskById })
+}
+```
+</Pre>
+
