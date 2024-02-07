@@ -1,0 +1,66 @@
+---
+title: React Query
+description: Outil pour gérer de l'asynchrone
+---
+
+Voici à quoi va te servir useQuery :
+
+- le chargement des données
+- les erreurs
+- le caching des données
+- des mutations (post / patch / delete)
+- du rafraîchissement automatique
+
+- UseQuery peut prendre de nombreux paramètres: [doc](https://tanstack.com/query/v4/docs/framework/react/reference/useQuery)
+
+- L'avantage de useQuery c'est qu'il va mettre les données en 'cache' lorsqu'elles seront récupérées une première fois à l'api
+- La seconde ou les fois suivantes ou ces mêmes données seront rappelées par le même composant ou un autre cela évitera de faire la requête à nouveau.
+
+![useQuerySheme](/useQuery.PNG)
+
+### Les paramètres
+
+<Pre>
+```tsx
+Exemple :
+
+url : https://jsonplaceholder.typicode.com/todos
+clé : ["todos"]
+
+url : https://jsonplaceholder.typicode.com/todos/1
+clé : ["todo", 1]
+
+const { data, isLoading, isFetching, error, isError } = useQuery({ 
+  queryKey: ['todos'], // une clé simple car on récupère tous les todos
+  queryFn: getTodos, // la fonction qui va retourner les données
+  refetchOnWindowFocus: false, // ne pas rafraîchir la requête quand on focus la fenêtre
+  retry: false, // ne pas réessayer la requête en cas d'erreur
+  staleTime: 1000 * 60 * 5, // la requête est considérée comme périmée après 5 minutes
+  // etc...
+})
+```
+</Pre>
+
+### La valeur de retour
+
+Différence entre isPending, anciennement isLoading et isFetching
+- isPending sera vrai quand la request est en cours de chargement et qu'il n'y a pas de données.
+- isFetching sera vrai quand la request est en cours de chargement, peu importe si il y a des données !
+
+<Pre>
+```tsx
+const {
+  status, // loading | error | succes
+  data, // Les données
+  isPending, // Si le statut est en chargement
+  isFetching, // En cours de fetch ou refetch
+  error, // L'erreur
+  isError, // Si le statut est error
+  isSuccess, // Si le statut est succes
+  refetch, // refetch la requête
+} = useQuery({ queryKey: ["todos"], queryFn: getTodos });
+```
+</Pre>
+
+isLoading est devenu isPending dans la version 5
+![useQuerySheme](/isLoading_isFetching.PNG)

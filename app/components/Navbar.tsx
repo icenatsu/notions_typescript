@@ -3,14 +3,9 @@
 import Image from "next/image";
 import { Icon } from "@iconify/react";
 import { useState } from "react";
-import { lessonName } from "@/app/page";
 import NavLinks from "@components/NavLinks";
 
-type NavbarProps = {
-  handleClickCategoryLessons: (arg0: lessonName) => void;
-};
-
-const Navbar = ({ handleClickCategoryLessons }: NavbarProps) => {
+const Navbar = () => {
   const [showMenu, setShowMenu] = useState<boolean>(false);
 
   const handleClick = () => {
@@ -36,13 +31,12 @@ const Navbar = ({ handleClickCategoryLessons }: NavbarProps) => {
         <p className="text-md grow-[1.5] font-sacramento">
           ice&apos;s Revision Directory
         </p>
-        <ul className="hidden grow-[6] justify-around md:flex">
+        <ul className="hidden grow-[6] justify-around lg:flex">
           <NavLinks
             closeMenu={handleClickCloseMenu}
-            handleClickCategoryLessons={handleClickCategoryLessons}
           />
         </ul>
-        <div className="p-4 md:hidden" onClick={handleClick}>
+        <div className="p-4 lg:hidden" onClick={handleClick}>
           <Icon
             aria-label="Afficher le menu"
             icon="icon-park-outline:hamburger-button"
@@ -51,10 +45,9 @@ const Navbar = ({ handleClickCategoryLessons }: NavbarProps) => {
         </div>
       </nav>
       {showMenu && (
-        <ul className="flex basis-full flex-col items-center bg-jade3 md:hidden">
-          <NavLinks
+        <ul className="flex basis-full flex-col items-center bg-jade3 lg:hidden">
+          <NavLinks 
             closeMenu={handleClickCloseMenu}
-            handleClickCategoryLessons={handleClickCategoryLessons}
           />
         </ul>
       )}

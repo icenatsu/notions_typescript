@@ -1,0 +1,28 @@
+---
+title: Tips
+description: Astuces, rappels...
+---
+
+<Pre>
+```tsx
+  const chien = {
+    name: 'Rackham',
+    age: 13
+  }
+
+  const chien2 = {
+    name: 'Natsu',
+    race: 'golden retriever'
+  }
+
+  const chienFinal = {
+    ... chien, // copie de chien
+    ... chien2 // copie de chien2. Ecrasent les valeurs des propriétés existantes dans chien et en ajoute s'il y'en a des nouvelles
+  } // Donne :
+  const chienFinal: {
+    name: 'Natsu';
+    race: 'golden retriever';
+    age: 13;
+}
+```
+</Pre>

@@ -1,6 +1,7 @@
-import './globals.css'
-import type { Metadata } from 'next'
-import { Inter, Sacramento } from 'next/font/google'
+import "./globals.css";
+import type { Metadata } from "next";
+import { Inter, Sacramento } from "next/font/google";
+import Navbar from "@components/Navbar";
 
 const inter = Inter({
   weight: ["300"],
@@ -12,30 +13,37 @@ const inter = Inter({
   display: "swap",
 });
 
-const sacramento= Sacramento({
-   weight: "400", 
-   subsets: ["latin"],
-   preload: true,
-   fallback: ["Arial", "sans serif"],
-   adjustFontFallback: false,
-   display: "swap",
-   variable: "--font--sacramento",
-})
-
+const sacramento = Sacramento({
+  weight: "400",
+  subsets: ["latin"],
+  preload: true,
+  fallback: ["Arial", "sans serif"],
+  adjustFontFallback: false,
+  display: "swap",
+  variable: "--font--sacramento",
+});
 
 export const metadata: Metadata = {
   title: "Ice's Revision Directory",
-  description: 'Cours et révisions décernées à la programmation web',
-}
+  description: "Cours et révisions décernées à la programmation web",
+};
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={`${inter.variable} ${sacramento.variable}`}>{children}</body>
+    <html lang="fr">
+      <body className={`${inter.variable} ${sacramento.variable}`}>
+        <header>
+          <Navbar />
+        </header>
+        <main>{children}</main>
+        <footer className="fixed bottom-0 w-full text-center text-sm">
+          @Design by ice
+        </footer>
+      </body>
     </html>
-  )
+  );
 }

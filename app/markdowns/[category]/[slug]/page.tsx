@@ -6,6 +6,8 @@ import { MDXRemote } from "next-mdx-remote/rsc";
 import {visit} from "unist-util-visit"
 import {Pre} from "@components/PreComponent";
 import {ColoredHeading} from "@components/CustomComponentsMdx/ColoredHeading";
+import BackButton from "@/app/components/CustomComponentsMdx/BackButton";
+import { lessonName } from "@components/NavLinks";
 
 // generateStaticParams remplace la fonction getStaticPaths et getStaticProps dans App router
 export async function generateStaticParams() {
@@ -14,7 +16,6 @@ export async function generateStaticParams() {
   const paths = mdDir.flatMap((dir) => {
     const files = fs.readdirSync(path.join("markdowns", dir));    
 
-  
     return files.map((filename) => ({      
       category: dir, // Catégorie représente le lien après /markdowns/[category]/
       slug: filename.replace(".mdx", ""), // Slug représente le lien après /markdowns/[category]/[slug]
@@ -41,26 +42,30 @@ async function getLessons({ category, slug }: getLessonsProps) {
   return {
     content,
     fontMatter,
+    category
   };
 }
 
 export default async function Page({ params }: any) {
 
-  
   const props = await getLessons(params);
 
   const components = {
     Pre,
-    ColoredHeading
+    ColoredHeading,
+    BackButton
   };
 
   return (
-    <article className="prose md:prose-md lg:prose-lg prose-slate !prose-invert mx-auto">
-      <h1 className="text-jade11">{props.fontMatter.title}</h1>
-
+    <article className="flex flex-col items-center justify-center xl:flex-row">
+      <div className="xl:pl-40 text-8xl">
+      <BackButton lesson = {props.category as lessonName}/>
+      </div>
+      <div className="prose md:prose-md lg:prose-lg prose-slate !prose-invert mx-auto">
+      <h1 className="text-jade11 pt-10">{props.fontMatter.title}</h1>
       <MDXRemote
         source={props.content}
-        components={components }
+        components={ components }
         options={{
           mdxOptions: {
             rehypePlugins: [
@@ -110,6 +115,8 @@ export default async function Page({ params }: any) {
           },
         }}
       ></MDXRemote>
+
+      </div>
     </article>
   );
 }

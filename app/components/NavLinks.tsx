@@ -1,46 +1,27 @@
-import { lessonName } from "@/app/page";
+import Link from "next/link";
 
 type NavLinksProps = {
   closeMenu: () => void;
-  handleClickCategoryLessons: (arg0: lessonName) => void;
 };
 
-const NavLinks = ({ closeMenu, handleClickCategoryLessons }: NavLinksProps) => {
-  const handleClickTypescriptLessons = () => {
-    handleClickCategoryLessons("typescript");
-    closeMenu();
-  };
+export type lessonName = "typescript" | "next" | "fetch" | "javascript" | "";
 
-  const handleClickNextLessons = () => {
-    handleClickCategoryLessons("next");
-    closeMenu();
-  };
+const NavLinks = ({ closeMenu }: NavLinksProps) => {
 
-  const handleClickFetchLessons = () => {
-    handleClickCategoryLessons("fetch");
-    closeMenu();
-  };
+  const lessons = ["javascript","typescript","fetch","next"]
 
   return (
     <>
-      <li
-        className="cursor-pointer p-2 text-base font-bold sm:w-full sm:hover:bg-jade4 md:w-4 md:p-0 md:hover:bg-transparent"
-        onClick={handleClickTypescriptLessons}
+
+      {lessons.map((lesson,idx) => (
+        <li
+        key={`lesson${idx}`}
+        className="cursor-pointer p-2 text-base font-bold sm:w-full sm:hover:bg-jade4 lg:w-4 lg:p-0 lg:hover:bg-transparent"
+        onClick={() => closeMenu()}
       >
-        Typescript
+        <Link href={`/markdowns/${lesson}/`}>{lesson.charAt(0).toUpperCase() + lesson.substring(1)}</Link>
       </li>
-      <li
-        className="cursor-pointer p-2 text-base font-bold sm:w-full sm:hover:bg-jade4 md:w-4 md:p-0 md:hover:bg-transparent"
-        onClick={handleClickFetchLessons}
-      >
-        Fetch
-      </li>
-      <li
-        className="cursor-pointer p-2 text-base font-bold sm:w-full sm:hover:bg-jade4 md:w-4 md:p-0 md:hover:bg-transparent"
-        onClick={handleClickNextLessons}
-      >
-        NextJs
-      </li>
+      ))}
     </>
   );
 };

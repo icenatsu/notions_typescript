@@ -1,17 +1,22 @@
+'use client'
 import Link from "next/link";
 import { useFetch } from "@Hooks/Fetch/useFetch";
-import { lessonName } from "@/app/page";
 import { Icon } from "@iconify/react";
+import { lessonName } from "@components/NavLinks";
+import { usePathname } from 'next/navigation'
 
-type listLessonProps = {
-  lesson: lessonName;
-};
+const ListLessons = () => {
 
-const ListLessons = ({ lesson }: listLessonProps) => {
+  const pathname = usePathname()
+  const lesson = pathname.split('/')[2] as lessonName
+  
   const { data } = useFetch(lesson);
 
   return (
     <div className="flex flex-col items-center justify-center xl:flex-row">
+      {lesson === "javascript" && (
+        <Icon icon="skill-icons:javascript" className="mt-4 xl:mr-20 text-9xl"/>
+      )}
       {lesson === "typescript" && (
         <Icon icon="logos:typescript-icon-round" className="mt-4 xl:mr-20 text-9xl" />
       )}
@@ -21,7 +26,6 @@ const ListLessons = ({ lesson }: listLessonProps) => {
       {lesson === "fetch" && (
         <Icon icon="tabler:api" className="mt-4 xl:mr-20 text-9xl" />
       )}
-
       <div className="flex flex-col items-center gap-10">
         <h1 className="m-4 text-jade11">
           {lesson.charAt(0).toUpperCase() + lesson.substring(1)}
@@ -30,7 +34,7 @@ const ListLessons = ({ lesson }: listLessonProps) => {
           <h2 className="m-5 text-jade12">Catégories</h2>
 
           <div className="m-4 mt-10 flex flex-col gap-4">
-            {data?.map((markdown, idx) => (
+            {data?.map((markdown) => (
                 <Link
                   key={markdown.slug}
                   href={`/markdowns/${lesson}/${markdown.slug}`}

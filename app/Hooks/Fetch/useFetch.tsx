@@ -16,6 +16,7 @@ const LessonsSchema = z.array(LessonSchema);
 type LessonsResponse = z.infer<typeof LessonsSchema>;
 
 export const useFetch = (folder: string) => {
+  
   const [data, setData] = useState<LessonsResponse>([]);
 
   // Création du abortController
@@ -27,7 +28,7 @@ export const useFetch = (folder: string) => {
     try {
       // passage du signal à l'API
       const res = await(await fetch(
-        `api/listLessons?folder=${encodeURIComponent(folder)}`,{signal}
+        `/api/listLessons?folder=${encodeURIComponent(folder)}`, {signal}
       )).json();
 
       if (!signal.aborted) {
@@ -39,7 +40,6 @@ export const useFetch = (folder: string) => {
       }
 
     } catch (e: any) {
-      console.log('error');
       
       if(e.name === "AbortError") return;
       setData([]);
