@@ -57,12 +57,13 @@ export default async function Page({ params }: any) {
   };
 
   return (
-    <article className="flex flex-col items-center justify-center xl:flex-row">
-      <div className="xl:pl-40 text-8xl">
-      <BackButton lesson = {props.category as lessonName}/>
-      </div>
-      <div className="prose md:prose-md lg:prose-lg prose-slate !prose-invert mx-auto">
+    <article className="prose md:prose-md lg:prose-lg prose-slate !prose-invert mx-auto">
+      <div className="flex items-center justify-between">
       <h1 className="text-jade11 pt-10">{props.fontMatter.title}</h1>
+      <span className="inline text-5xl border border-solid rounded-md hover:bg-jade4">
+        <BackButton lesson = {props.category as lessonName}/>
+      </span>
+      </div>
       <MDXRemote
         source={props.content}
         components={ components }
@@ -115,8 +116,6 @@ export default async function Page({ params }: any) {
           },
         }}
       ></MDXRemote>
-
-      </div>
     </article>
   );
 }

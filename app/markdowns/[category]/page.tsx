@@ -9,10 +9,7 @@ const Page = () => {
 
     return (
         <>
-            {lesson === "typescript" && <ListLessons />}
-            {lesson === "next" && <ListLessons />}
-            {lesson === "fetch" && <ListLessons />}
-            {lesson === "javascript" && <ListLessons />}
+            {lesson !== "" && <ListLessons />}
         </>
     );
 };
