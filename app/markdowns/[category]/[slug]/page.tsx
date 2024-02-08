@@ -59,7 +59,7 @@ export default async function Page({ params }: any) {
   };
 
   return (
-    <article className="prose md:prose-md lg:prose-lg prose-slate !prose-invert mx-auto">
+    <article className="prose md:prose-md lg:prose-lg xl:prose-xl prose-slate !prose-invert mx-auto">
       <div className="flex items-center justify-between">
       <h1 className="text-jade11 pt-10">{props.fontMatter.title}</h1>
       <span className="inline text-5xl border border-solid rounded-md hover:bg-jade4">

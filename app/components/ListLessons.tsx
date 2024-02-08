@@ -4,6 +4,7 @@ import { Icon } from "@iconify/react";
 import { lessonName } from "@components/NavLinks";
 import { usePathname } from "next/navigation";
 import useLessons from "@Hooks/useLessons"
+import Loader from "@components/Loader"
 
 const ListLessons = () => {
   const pathname = usePathname();
@@ -12,7 +13,7 @@ const ListLessons = () => {
   const { data, isPending } = useLessons(lesson)
 
   if (isPending) {
-    return "Loading....";
+    return <Loader/>;
   }
   
   const markdowns = data
