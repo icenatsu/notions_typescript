@@ -18,7 +18,7 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="relative flex h-14 items-center bg-jade9 border-b-2 border-b-jade7">
+      <nav className="relative flex h-14 items-center bg-jade5 border-b-2 border-b-jade6">
         <div className="grow-[0.1] p-4">
           <Image
             className="rounded-full"
