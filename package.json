@@ -9,7 +9,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@radix-ui/colors": "^3.0.0",
     "@tanstack/react-query": "^5.18.1",
     "gray-matter": "^4.0.3",
     "next": "latest",

@@ -44,8 +44,8 @@ export async function client<T>(
     if (response.status !== 204) {
       result = await response.json();      
     }
-
-    if (response.ok) {
+    
+    if (response.ok) {    
       return zodSchema && result ? zodSchema.parse(result) : result;
     } else {
       throw result;

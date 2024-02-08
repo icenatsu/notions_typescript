@@ -2,6 +2,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Inter, Sacramento } from "next/font/google";
 import Navbar from "@components/Navbar";
+import Providers from "./providers";
 
 const inter = Inter({
   weight: ["300"],
@@ -36,13 +37,15 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body className={`${inter.variable} ${sacramento.variable}`}>
-        <header>
-          <Navbar />
-        </header>
-        <main>{children}</main>
-        <footer className="fixed bottom-0 w-full text-center text-sm">
-          @Design by ice
-        </footer>
+        <Providers>
+          <header>
+            <Navbar />
+          </header>
+          <main>{children}</main>
+          <footer className="fixed bottom-0 w-full text-center text-sm">
+            @Design by ice
+          </footer>
+        </Providers>
       </body>
     </html>
   );

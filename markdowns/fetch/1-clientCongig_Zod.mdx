@@ -14,7 +14,7 @@ description: fonction client préconfigurée pour fetch les données
 // 4- client<T> qui le fournit au
 // 5- retour de la promise<T>
 
-const getData = async(signal: AbortSignal) => 
+const getLessons = async(signal: AbortSignal) => 
   client('/api/tweets', {signal : signal, zodSchema: TweetsScheme});
 
 type ClientConfig<T> = {

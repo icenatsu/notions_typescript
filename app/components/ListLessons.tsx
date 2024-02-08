@@ -1,38 +1,21 @@
 "use client";
 import Link from "next/link";
-import { getData } from "@utils/getData";
 import { Icon } from "@iconify/react";
 import { lessonName } from "@components/NavLinks";
 import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
-import { LessonsResponse } from "@utils/types";
-import { LessonsSchema } from "@utils/schemas";
+import useLessons from "@Hooks/useLessons"
 
 const ListLessons = () => {
   const pathname = usePathname();
   const lesson = pathname.split("/")[2] as lessonName;
 
-  const [data, setData] = useState<LessonsResponse | null>(null);
+  const { data, isPending } = useLessons(lesson)
 
-  useEffect(() => {
-    const abortController = new AbortController();
-
-    getData(lesson, abortController.signal, LessonsSchema)
-      .then((data) => {
-        setData(data);
-      })
-      .catch((e) => {
-        if (e.name === "AbortError") return;
-
-        setData([]);
-
-        throw { e };
-      });
-
-    return () => {
-      abortController.abort;
-    };
-  }, [lesson]);
+  if (isPending) {
+    return "Loading....";
+  }
+  
+  const markdowns = data
 
   return (
     <div className="flex flex-col items-center justify-center xl:flex-row">
@@ -55,7 +38,8 @@ const ListLessons = () => {
         />
       )}
       {lesson === "fetch" && (
-        <Icon icon="tabler:api" className="mt-4 text-9xl xl:mr-20" />
+        <Icon icon="tabler:api" 
+        className="mt-4 text-9xl xl:mr-20" />
       )}
       <div className="flex flex-col items-center gap-10">
         <h1 className="m-4 text-jade11">
@@ -65,7 +49,7 @@ const ListLessons = () => {
           <h2 className="m-5 text-jade12">Catégories</h2>
 
           <div className="m-4 mt-10 flex flex-col gap-4">
-            {data?.map((markdown) => (
+            {markdowns?.map((markdown) => (
               <Link
                 key={markdown.slug}
                 href={`/markdowns/${lesson}/${markdown.slug}`}
