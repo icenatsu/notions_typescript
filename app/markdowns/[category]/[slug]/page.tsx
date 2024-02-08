@@ -8,6 +8,8 @@ import {Pre} from "@components/PreComponent";
 import {ColoredHeading} from "@components/CustomComponentsMdx/ColoredHeading";
 import BackButton from "@/app/components/CustomComponentsMdx/BackButton";
 import { lessonName } from "@components/NavLinks";
+import remarkEmoji from "remark-emoji"
+
 
 // generateStaticParams remplace la fonction getStaticPaths et getStaticProps dans App router
 export async function generateStaticParams() {
@@ -69,6 +71,7 @@ export default async function Page({ params }: any) {
         components={ components }
         options={{
           mdxOptions: {
+            remarkPlugins: [remarkEmoji as any],
             rehypePlugins: [
               () => (tree) => {
                 visit(tree, (node) => {
@@ -91,7 +94,7 @@ export default async function Page({ params }: any) {
                   }
                 });
               },
-              [
+              [ 
                 rehypePrettyCode as any,
                 {
                   defaultLang: "plaintext",
