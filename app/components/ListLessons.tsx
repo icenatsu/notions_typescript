@@ -6,14 +6,20 @@ import { usePathname } from "next/navigation";
 import useLessons from "@Hooks/useLessons"
 import Loader from "@components/Loader"
 
+// 1 
+
 const ListLessons = () => {
   const pathname = usePathname();
   const lesson = pathname.split("/")[2] as lessonName;
 
-  const { data, isPending } = useLessons(lesson)
+  const { data, isPending, error } = useLessons(lesson)
 
   if (isPending) {
     return <Loader/>;
+  }
+
+  if(error){
+    return 'Error'
   }
   
   const markdowns = data

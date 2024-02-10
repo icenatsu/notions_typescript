@@ -1,0 +1,131 @@
+---
+title: Mutations
+description: Outil pour gérer de l'asynchrone
+---
+
+React-query permet aussi de faire des mutations qui te permettent de modifier les données.
+On va utiliser le hook useMutation qui nous permet de créer une mutation. Il va aussi falloir afficher le loading et les erreurs.
+Le hook useMutation va retourner un tableau avec une fonction mutate qu'on va appeler pour modifier nos données ainsi qu'un object qui contient tout ce que useQuery retourne (ou presque)
+
+Si tu n'utilises pas ceci :
+
+- le loading
+- la gestion d'erreur
+- les différentes fonctions
+- Ou autre, il est inutile d'utiliser mutation, un simple événement suffit.
+
+```tsx
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { fetchUsers, addUser, deleteUser, User } from "./userStore";
+import { FormEvent } from "react";
+
+export const Demo = () => {
+  const { data, error, isLoading, isFetching, isError } = useQuery({
+    queryKey: ["users"],
+    queryFn: () => fetchUsers()
+  });
+
+  const queryClient = useQueryClient();
+
+  // On ajoute un nouvel utilisateur de type user sans son Id  
+  const addMutation = useMutation(
+    {
+      mutationFn:(newUser: Omit<User, "id">) => addUser(newUser),
+      onSuccess: () => {
+        // Il permet d'invalider les requêtes en cours, ce qui aura pour effet d'en provoquer de nouvelles pour la query invalidée.
+        // (étant donnée que les données de Users changent puisqu'on rajoute un utilisateur)
+        queryClient.invalidateQueries(["users"]);
+      },
+      onError: (err) => {
+        console.error(err);
+      }
+    }
+  );
+
+  // On delete un utilisateur existant en prenant son id
+    const deleteMutation = useMutation(
+    {
+      mutationFn:(userId: number) => deleteUser(userId),
+      onSuccess: () => {
+        queryClient.invalidateQueries(["users"]);
+      },
+      onError: (err) => {
+        console.error(err);
+      }
+    }
+  );
+
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    // On récupère les données de l'utilisateur avec formData
+    const formData = new FormData(e.currentTarget);
+    const name = String(formData.get("name"));
+    const age = Number(formData.get("age"));
+
+    // et on lance la mutation en ajoutant ces données
+    addMutation.mutate({
+      name,
+      age
+    });
+  };
+
+  if (isError) {
+    return <p>{String(error)}</p>;
+  }
+
+  // On supprime l'utilisateur via son id et on lance la mutation en supprimant les données
+  const handleDelete = (userId: number) => {
+      deleteMutation.mutate(userId);
+  }
+
+  // on pourra utiliser variables et isLoading pour afficher des informations supplémentaires qui améliorent l'expérience utilisateur
+  return (
+    <div>
+      <form className="form" onSubmit={handleSubmit}>
+        <input placeholder="Name" name="name" type="text" />
+        <input placeholder="Age" name="age" type="number" />
+        <button type="submit">Submit</button>
+        {addMutation.isLoading ? "Submit user loading..." : null} 
+      </form>
+
+      <h3>Users</h3>
+      {isFetching ? "Loading..." : null}
+      {data && !isLoading ? (
+        <ul className="users">
+          {data.map((user) => {
+
+            if(deleteMutation.variables === user.id){
+              return <li className="user" key={user.id}>Deleting...</li>
+            }
+          
+            return (
+              <li className="user" key={user.id}>
+                <span>
+                  {user.name} - {user.age}
+                </span>
+                <button onClick={() => deleteMutation.mutate(user.id)}>x</button>
+              </li>
+            );
+          })}
+        </ul>
+      ) : null}
+    </div>
+  );
+};
+```
+
+### Différence useQuery / Mutation
+
+- useQuery :
+
+    - Utilisé pour interroger des données distantes et les mettre en cache localement.
+    - Principalement utilisé pour les opérations de lecture (GET), telles que la récupération de données à afficher dans l'interface utilisateur.
+    - Les requêtes sont généralement des opérations de lecture de données qui ne modifient pas l'état de la source de données.
+
+- Mutations :
+
+    - Utilisé pour effectuer des opérations de modification (CRUD) sur les données distantes.
+    - Principalement utilisé pour les opérations de création (POST), de mise à jour (PUT/PATCH) et de suppression (DELETE) de données.
+    - Les mutations sont des opérations qui modifient l'état de la source de données, comme ajouter un nouvel enregistrement, mettre à jour un enregistrement existant ou supprimer un enregistrement.
