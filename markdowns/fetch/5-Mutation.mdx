@@ -116,13 +116,19 @@ export const Demo = () => {
 };
 ```
 
-### Différence useQuery / Mutation
+### Différence useQuery / useInfinite Query / Mutation
 
 - useQuery :
 
     - Utilisé pour interroger des données distantes et les mettre en cache localement.
     - Principalement utilisé pour les opérations de lecture (GET), telles que la récupération de données à afficher dans l'interface utilisateur.
     - Les requêtes sont généralement des opérations de lecture de données qui ne modifient pas l'état de la source de données.
+
+- useInfiniteQuery :
+
+    - Utilisé pour interroger des données distantes par pagination infinie et les mettre en cache localement.
+    - Principalement utilisé pour les opérations de lecture (GET) où les données sont paginées, telles que la récupération de grandes listes d'éléments.
+    - Les requêtes sont effectuées de manière incrémentielle pour charger les données en plusieurs pages, permettant ainsi de limiter le volume de données chargées à la fois.
 
 - Mutations :
 

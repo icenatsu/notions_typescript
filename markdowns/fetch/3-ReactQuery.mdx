@@ -3,6 +3,8 @@ title: React Query
 description: Outil pour gérer de l'asynchrone
 ---
 
+## UseQuery
+
 Voici à quoi va te servir useQuery :
 
 - le chargement des données
@@ -53,11 +55,11 @@ Différence entre isPending, anciennement isLoading et isFetching
 const {
   status, // loading | error | succes
   data, // Les données
-  isPending, // Si le statut est en chargement
-  isFetching, // En cours de fetch ou refetch
+  isPending, // Si des données sont en chargement car pas déjà mise en cache ? true : false 
+  isFetching, // En cours de fetch ou refetch 
   error, // L'erreur
-  isError, // Si le statut est error
-  isSuccess, // Si le statut est succes
+  isError, // Si le statut est error ? true : false
+  isSuccess, // Si le statut est succes ? true : false
   refetch, // refetch la requête
 } = useQuery({ queryKey: ["todos"], queryFn: getTodos });
 ```
@@ -171,3 +173,177 @@ const prefetchTask = (taskId) => {
 ```
 </Pre>
 
+## UseInfiniteQuery (scroll infini)
+
+- Avec Button pour charger la suite des données
+
+<Pre>
+```tsx
+// Fonction fetch
+const getTweets = async (signal?: AbortSignal, page = 0) =>
+  client(`/api/tweets?page=${page}`, { signal, zodSchema: TweetsScheme });
+
+export default function FetchAllTweets() {
+  const {
+    data, // Les données retournées
+    isLoading, // Lorsqu'on charge les données si elles ne sont pas déjà en cache
+    isFetching, // Lorqu'on appelle l'api (tweets)
+    isError, // Si erreur lors de la récupération des données ? true : false
+    isFetchingNextPage, // Lorsque on appelle la page suivante ? true : false
+    hasNextPage, // Lorsqu'il y'a une page suivante disponible à récupérer ? true : false
+    fetchNextPage, // Fonction qui récupère la page suivante. Cette fonction est généralement appelée lorsque l'utilisateur atteint le bas de la liste ou lorsqu'il souhaite charger plus de données dans une application paginée.
+    refetch // Fonction pour recharger les données lors d'une requête
+  } = useInfiniteQuery({
+    queryKey: ['tweets'],
+    // pageParam correspond à la page récupérée par getNextPageParam, elle sera donc undefined car il n'y a pas de page à charger et nous retournerons la page 0.
+    queryFn: ({ signal, pageParam }) => getTweets(signal, pageParam),
+    // la fonction getNextPageParam renverra 0 (donc la première page) pour indiquer qu'il n'y a pas de page suivante à charger. 
+    getNextPageParam: (lastPage) => lastPage.nextPage,
+    onError: () => notifyFailed(),
+  });
+
+    if (isLoading) {
+    return <Loader />;
+  }
+
+  if (isError) {
+    // On refetch la page 0 en cas d'erreur
+    return <Error error="Couldn't fetch tweet..." reset={() => refetch({ refetchPage: (page, index) => page })} />;
+  }
+  
+  // On transforme les multiples tableaux tweets en un seul
+  const tweets = data.pages.flatMap((page) => page.tweets);
+  
+  // nextPageStatus indique s'il y'a une page suivante disponible à charger
+  const nextPageStatus = hasNextPage ? 'hasNextPage' : 'noNextPage';
+
+  return (
+    <TwitterLayout>
+      <AddTweet />
+      {tweets.map((tweet) => {
+        return (
+          <Tweet key={tweet.id} tweet={tweet}>
+            <RepliesButton count={tweet._count.replies} />
+            <LikeButton count={tweet._count.likes} liked={tweet.liked} />
+          </Tweet>
+        );
+      })}
+  
+      <button onClick={() => fetchNextPage()} className="block py-4">
+        {isFetchingNextPage ? 'Loading more...' : nextPageStatus}
+      </button>
+      ;
+    </TwitterLayout>
+  );
+}
+// On appelle la fonction pour charger la page suivante lorsqu'on clique sur le bouton
+// Si le fetch est en cours alors on charge sinon on affiche si une page suivante est disponible
+```
+</Pre>
+
+- Avec rechargement automatique des données avec l'API IntersectionObserver
+
+<Pre>
+```tsx
+const TWEET_KEY = {
+  all: 'tweets'
+};
+
+const getTweets = async (signal?: AbortSignal, page = 0) =>
+  client(`/api/tweets?page=${page}`, { signal, zodSchema: TweetsScheme });
+
+const useOnVisible = (
+  ref: React.RefObject<HTMLElement>,
+  callback: () => void
+) => {
+  useEffect(() => {    
+    if (!ref.current) return;
+
+    // Je récupère l'élément car `ref.current` peut changer entre les renders
+    const current = ref.current;
+
+    // Je créer mon observer
+    const observer = new IntersectionObserver(
+      ([entry]) => {          
+        // if (entry.isIntersecting) { ... } : Vérifie si l'élément cible est en train d'entrer dans la zone d'intersection avec le conteneur ? true : false
+        if (entry.isIntersecting) {
+          // Fonction appelée lorsque l'élément cible entre dans la zone d'intersection
+          callback();
+        }
+      },
+      { threshold: 1 } // 0,5 déclenchera lorsque l'élément cible sera à moitié visible / 1 : complètement visible
+    );
+    
+    // Je l'observe
+    observer.observe(current);
+
+    return () => {
+      // J'arrête l'observation si mon hooks est démonté
+      observer.unobserve(current);
+    };
+  }, [ref, callback]);
+
+  // return ref;
+};
+
+type ButtonNextProps = {
+  fetchNextPage: () => void,
+}
+
+const ButtonNext  = ({fetchNextPage}: ButtonNextProps) => {
+
+  // On fait le bouton next à part car il faut qu'il soit rendu après que les données de tweet soient affichées sinon celà causera un mauvais fonctionnement de l'observer
+  // La fonction de rappel ne sera pas déclenchée si l'élément cible est déjà dans le viewport avec l'affichage de données asynchrone par useInfiniteQuery qui fournit la fonction de rappel fetchNextPage
+
+  const targetRef = useRef<HTMLDivElement>(null);
+  useOnVisible(targetRef, fetchNextPage);
+
+  return (
+    <div ref={targetRef}>Test</div>
+  );
+};
+
+// Bonne pratique de mettre les useQuery Dans des hooks personnalisés
+const useQueryData = () =>{
+  return useInfiniteQuery({
+    queryKey: [TWEET_KEY.all],
+    // pageParam sera donc undefined car il n'y a pas de page à charger.
+    queryFn: ({ signal, pageParam }) => getTweets(signal, pageParam),
+    // la fonction getNextPageParam renverra 0 (donc la première page) pour indiquer qu'il n'y a pas de page suivante à charger. 
+    getNextPageParam: (lastPage) => lastPage.nextPage,
+    onError: () => notifyFailed(),
+  });
+};
+
+export default function FetchAllTweets() {
+  // On récupère les valeus dont on a besoin propres à useInfiniteQuery
+  const {data, isLoading, isError, fetchNextPage, refetch} = useQueryData();
+
+  if (isLoading) {
+    return <Loader />;
+  }
+  
+  if (isError) {
+    return <Error error="Couldn't fetch tweet..." reset={() => refetch({ refetchPage: (page, index) => index === 0 })} />;
+  }
+
+  const tweets = data.pages.flatMap((page) => page.tweets);
+  // const nextPageStatus = hasNextPage ? 'hasNextPage' : 'noNextPage';
+
+  return (
+    <TwitterLayout>
+      <AddTweet />
+      {tweets.map((tweet) => {
+        return (
+          <Tweet key={tweet.id} tweet={tweet}>
+            <RepliesButton count={tweet._count.replies} />
+            <LikeButton count={tweet._count.likes} liked={tweet.liked} />
+          </Tweet>
+        );
+      })}
+      <ButtonNext fetchNextPage={fetchNextPage}/>
+    </TwitterLayout>
+  );
+}
+```
+</Pre>
