@@ -3,3 +3,35 @@ title: SSG/ISR
 description: Static Site Generation et Incremental Static Regeneration
 ---
 
+## SSG
+
+1) Lors du déploiement on récupère directement les données de notre datablase
+2) On attend donc beaucoup moins longtemps que le premier contenu soit visible car le serveur possède déjà toutes les pages HTML => 
+	- en parallèle récupère bundle javascript (fichier généré après la compilation de fichiers javascript)
+3) run le javascript et lance l'hydration
+4) page interractive TTI
+
+### concrètement:
+
+L'utilisateur ouvre une page :
+- Le serveur récupère directement la page HTML crées lors du déploiement de l'application 
+- Run le javascript pour avoir notre page interactive (TTI)
+
+Lors du déploiement on récupère directement les données de notre datablase
+
+## ISR
+
+1) Lors du déploiement on récupère directement les données de notre datablase
+2) On attend donc beaucoup moins longtemps que le premier contenu soit visible car le serveur possède déjà toutes les pages HTML => 
+	- La différence avec le ISR c'est qu'on va lui indiquer un temps au serveur pour qu'il refetch les données lui même (exemple toutes les 10minutes, pour un affichage de commentaires toutes les 10minutes et non instant par exemple) 
+	- en parallèle récupère bundle javascript (fichier généré après la compilation de fichiers javascript)
+3) run le javascript et lance l'hydration
+4) page interractive TTI
+
+### concrètement:
+
+L'utilisateur ouvre une page :
+- Le serveur récupère directement la page HTML crées lors du déploiement de l'application 
+- Run le javascript pour avoir notre page interactive (TTI)
+
+![schema](/ssg_isr.webp)
