@@ -19,7 +19,7 @@ Voici à quoi va te servir useQuery :
 - La seconde ou les fois suivantes ou ces mêmes données seront rappelées par le même composant ou un autre cela évitera de faire la requête à nouveau.
 - Avec un useEffect on va avoir un appel constant à l'API a chaque fois que le ou les composants se remontent. C'est pour cela que ce n'est pas une bonne pratique
 
-![useQuerySheme](/useQuery.PNG)
+![useQuerySheme](/useQuery.webp)
 
 ### Les paramètres
 
@@ -66,7 +66,7 @@ const {
 </Pre>
 
 isLoading est devenu isPending dans la version 5
-![useQuerySheme](/isLoading_isFetching.PNG)
+![useQuerySheme](/isLoading_isFetching.webp)
 
 ### Exemple
 
@@ -258,7 +258,6 @@ const useOnVisible = (
 ) => {
   useEffect(() => {    
     if (!ref.current) return;
-
     // Je récupère l'élément car `ref.current` peut changer entre les renders
     const current = ref.current;
 

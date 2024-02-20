@@ -1,0 +1,162 @@
+---
+title: Optimistic Update
+description: Amélioration de l'interface utilisateur
+---
+
+- On va être optimiste et dire que la mutation a réussi avant même de faire la request 
+- ce qui va nous permettre de modifier l'état de l'application sans attendre la réponse du serveur.
+- onMutate va nous permettre de modifier l'état de l'application avant même de faire la requête.
+
+- Cela va permettre de changer les données directement dans le cache sans passer par l'api pour avoir un affichage direct
+- En cas d'erreur on va dire à useQuery de remettre à l'état initial
+
+## Etape sans Optimistic Update
+
+mutation 
+ - => request server http 
+ - réponse du serveur avec succès
+ - invalide la query pour synchroniser les nouvelles données
+ - refetch la query pour mettre à jour le cache
+ - update l'interface (affichage lent)
+
+## Etape avec Optimistic Update
+
+mutation 
+ - fake les nouvelles données dans le cache 
+ - update l'interface (affichage instantané)
+
+En arrière plan
+ Si succès
+ - => request server http
+ - réponse du serveur avec succès
+ - invalide la query pour synchroniser les nouvelles données
+ - refetch la query pour mettre à jour le cache
+
+ Si Ereur
+ - => request server http
+ - réponse du serveur avec erreur
+ - error qui va trigger le rollback
+ - remet les anciennes données dans le cash
+ - rollback l'interface
+
+Optimistic Update est utilisé pour update de la donnée non importante 
+- like, dislike, todo privée etc..
+
+Il ne faut pas l'utiliser pour 
+- l'ajout d'un tweet, d'un commentaire, d'informations personnelles (nom, prénom...)
+- création d'un produit, d'un élément, d'un user..
+On ne cherche pas à fake la création d'un élément.
+
+### Exemple avec une liste d'utilisateur
+
+<Pre>
+```tsx
+export const Demo = () => {
+  const { data, error, isLoading, isFetching, isError } = useQuery({
+    queryKey: ["users"],
+    queryFn: () => fetchUsers(),
+  });
+
+  const queryClient = useQueryClient();
+
+  const addMutation = useMutation(
+    (newUser: Omit<User, id>) => addUser(newUser),
+    {
+      onMutate: (user) => {
+        // On annule les requêtes en cours pour éviter les conflits
+        queryClient.cancelQueries(["users"]);
+
+        // On récupère les todos actuels pour pouvoir les rollback en cas d'erreur
+        const previousTodos = queryClient.getQueryData(["users"]);
+
+        // Update optimiste de nos todos
+        queryClient.setQueryData(["users"], (old: User[]) => {
+          return [
+            ...old,
+            {
+              id: Math.random(),
+              ...user,
+            },
+          ];
+        });
+
+        // On retourne la valeur précédente pour pouvoir la réutiliser dans le `onError`
+        return { previousTodos };
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries(["users"]);
+      },
+      onError: (err, variables, context) => {
+        console.log(err);
+        queryClient.setQueryData(["users"], context.previousUsers);
+      },
+    }
+  );
+
+  const deleteMutation = useMutation((id) => deleteUser(id), {
+    onSuccess: () => {
+      queryClient.invalidateQueries(["users"]);
+    },
+    onError: (err) => {
+      console.error(err);
+    },
+  });
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
+    const name = String(formData.get("name"));
+    const age = Number(formData.get("age"));
+
+    addMutation.mutate({
+      name,
+      age,
+    });
+  };
+
+  if (isError) {
+    return <p>{String(error)}</p>;
+  }
+
+  return (
+    <div>
+      <form className="form" onSubmit={handleSubmit}>
+        <input placeholder="Name" name="name" type="text" />
+        <input placeholder="Age" name="age" type="number" />
+        <button type="submit">Submit</button>
+      </form>
+
+      <h3>Users</h3>
+      {data && !isLoading ? (
+        <ul className="users">
+          {data.map((user) => {
+            if (deleteMutation.variables === user.id) {
+              return (
+                <li key={user.id} className="user">
+                  deleting...
+                </li>
+              );
+            }
+
+            return (
+              <li className="user" key={user.id}>
+                <span>
+                  {user.name} - {user.age}
+                </span>
+                <button
+                  disabled={deleteMutation.isLoading}
+                  onClick={() => deleteMutation.mutate(user.id)}
+                >
+                  x
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      ) : null}
+    </div>
+  );
+};
+```
+</Pre>

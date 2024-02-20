@@ -1,0 +1,59 @@
+---
+title: Les différences entre la v4 et la v5
+description: différences majeures v4/v5
+---
+
+## onSucces, onError = fini / place au try/catch
+
+<Pre>
+```tsx
+const query = useQuery({
+  queryFn: someAsyncFn(),
+  onSuccess: () => {
+    console.log("Success")
+  },
+  onError: () => {
+    console.log("Error")
+  },
+  onSettled: () => {
+    console.log("Settled")
+  }
+})
+
+Devient...
+
+const query = useQuery({
+  queryFn: async () => {
+    try {
+      const result = await someAsyncFn()
+      console.log("Success")
+      return result;
+    } catch (e) {
+      console.log("Error")
+      throw e
+    } finally {
+      console.log("Settled")
+    }
+  }
+})
+```
+</Pre>
+
+
+<Pre>
+```tsx
+const mutation = useMutation(async () => {
+  await someMutationFn()
+})
+
+Devient...
+
+const mutation = useMutation({
+  mutationFn: async () => {
+    await someMutationFn()
+  }
+})
+```
+</Pre>
+
+Aussi, ça peut paraître étrange mais le onSuccess, onSettled et onError sont toujours supportés dans le useMutation !

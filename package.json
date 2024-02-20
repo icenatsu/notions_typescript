@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@tanstack/react-query": "^5.18.1",
+    "@tanstack/react-query-devtools": "^5.24.0",
     "gray-matter": "^4.0.3",
     "next": "latest",
     "next-mdx-remote": "^4.4.1",

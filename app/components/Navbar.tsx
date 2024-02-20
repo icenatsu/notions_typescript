@@ -22,7 +22,7 @@ const Navbar = () => {
         <div className="grow-[0.1] p-4">
           <Image
             className="rounded-full"
-            src="/natsu2.png"
+            src="/natsu2.webp"
             alt="Natsu"
             width={50}
             height={50}

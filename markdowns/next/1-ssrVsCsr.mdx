@@ -1,0 +1,43 @@
+---
+title: CSR VS SSR
+description: Client side Rendering vs Server Side Rendering
+---
+
+## CSR
+
+1) premier contenu rapidement visible
+2) renvoie une fichier html vide et affiche le First Paint
+	- en parallèle récupère bundle javascript (fichier généré après la compilation de fichiers javascript)
+3) génère du javascript pour le rendu qui va afficher notre FCP ce qui va nous permettre d'avoir notre TTI (page interractive)
+4) ensuite pour afficher notre LCP il va falloir fetch des data
+
+### concrètement:
+
+L'utilisateur ouvre une page :
+- Demande le html au serveur et le récupère => page blanche (HTML Vide)
+- Demande les fichiers javascript au serveur et les récupère
+- Run le javascript et affiche les premiers éléments (FCP)
+- Fetch les données supplémentaires à la database qui va nous les renvoyer
+- Affiche LCP et nous avons notre page interractive complète
+
+
+## SSR
+
+1) On attend plus longtemps que le premier contenu soit visible
+2) On reçoit un HTML déjà rempli ce qui va nous permettre d'avoir directement notre FCP et LCP
+	- en parallèle récupère bundle javascript (fichier généré après la compilation de fichiers javascript)
+3) run le javascript et lance l'hydration
+4) page interractive TTI
+
+### concrètement:
+
+L'utilisateur ouvre une page :
+- (plus de temps que le csr car fait appel au serveur pour le HTML et se charge de fetch directement les données à la database, renvoie donc un fichier HTML avec les données mais c'est une page non interactive
+- Run le javascript pour avoir notre page interactive (TTI)
+
+## Les différences en schéma
+
+![difference](/csr_ssr.webp)
+
+![difference](/csr-ssr-dessin.webp)
+
