@@ -37,15 +37,15 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body className={`${inter.variable} ${sacramento.variable}`}>
-        <Providers>
           <header>
             <Navbar />
           </header>
+        <Providers>
           <main>{children}</main>
+        </Providers>
           <footer className="fixed bottom-0 w-full text-center text-sm">
             @Design by ice
           </footer>
-        </Providers>
       </body>
     </html>
   );
