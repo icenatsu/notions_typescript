@@ -1,0 +1,143 @@
+---
+title: Hydration
+description: Principe de l'hydratation
+---
+
+## Principe hydration
+
+- prend le fichier HTML et en fait une string
+- Dès que le client va recevoir le fichier HTML il va fetch le javascript propre au HTML (ce qui revient à fetch pour nextjs le composant App)
+- Ensuite on hydrate le composant, il va lier la string du fichier HTML (composant) et les éléments javascript qui lui sont propres (onclick, useState...)
+- Celà rend ensuite notre composant interactif.
+
+S'il n'y a pas d'hydratation on ne peut pas utiliser nos composants car ils ne seront justement pas interactifs 
+
+Parfois on souhaite que certains composants soient run uniquement côté client, et jamais côté serveur.
+
+On peut savoir si un composant est rendu côté server en utilisant
+
+<Pre>
+```tsx
+if (typeof window === 'undefined') {
+  // On est côté server
+} else {
+  // On est côté client
+}
+```
+</Pre>
+
+Si on souhaite qu'un composant soit rendu uniquement côté server, on peut faire ceci :
+
+<Pre>
+```tsx
+const Demo = () => {
+  if (typeof window === 'undefined') {
+    return <div>Je suis côté server</div>
+  }
+
+  return <div>Je suis côté client</div>
+}
+```
+</Pre>
+
+Si on fait ceci:
+
+<Pre>
+```tsx
+'use client'
+
+const Démo = () => {
+
+  if (typeof window === 'undefined') {
+    return <div>Je suis coté server</div>;
+  }
+
+  return (
+      <p>Je suis coté client</p>
+  );
+};
+
+export default Démo;
+```
+</Pre>
+
+On aura une grosse erreur d'hydratation. 
+- Effectivement, ce qu'on reçoit du serveur c'est un p avec le texte "Je suis côté server"
+- le client essaie de lier ce p avec le texte 'Je suis côté client', ce qui ne match pas.
+
+Si le server ne renvoie pas exactement la même chose que le client, l'hydratation ne fonctionnera pas ou elle s'adaptera quand même mais avec une grosse erreur dans le console
+
+### Pour résoudre ceci:
+
+- Celui-ci va avoir un state qui va être initialisé à false, donc côté serveur ce sera false. 
+- Au premier render côté client, on va changer la valeur de ce state à true.
+Mais quand le premier rend ce produit : on est déjà côté client ! Résultat : on n'aura plus d'erreur d'hydration.
+
+<Pre>
+```tsx
+const useIsClient = () => {
+	const [isClient, setIsClient] = useState(false);
+
+	// Sera appelé au premier render client side
+	useEffect(() => {
+		setIsClient(true)
+	}, [])
+
+	return isClient;
+}
+```
+</Pre>
+
+### Exemple:
+
+<Pre>
+```tsx
+'use client'
+import { useState, useEffect } from 'react';
+
+
+const useIsClient = () => {
+  const [isClient, setIsClient] = useState(false);
+
+  // Sera appelé au premier render client side
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+  return isClient;
+}
+
+const Démo = () => {
+  const isClient = useIsClient();
+
+  if (!isClient) {
+    return <div>Je suis coté server</div>;
+  }
+
+  return (
+    <div>
+      Je suis coté client
+    </div>
+  );
+};
+
+export default Démo;
+```
+</Pre>
+
+Alternativement, on peut aussi créer un composant ClientOnly pour wrapper nos composants uniquement rendus côté serveur :
+
+<Pre>
+```tsx
+function ClientOnly({ children }: PropsWithChildren) {
+  const isClient = useIsClient();
+
+  if (!isClient) {
+	  return null;
+  }
+
+  return children
+}
+```
+</Pre>
+

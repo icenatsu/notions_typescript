@@ -1,74 +1,91 @@
 "use client";
-import Link from "next/link";
+
 import { Icon } from "@iconify/react";
-import { lessonName } from "@components/NavLinks";
+import { categoryLessonName } from "@utils/types";
 import { usePathname } from "next/navigation";
-import useLessons from "@Hooks/useLessons"
-import Loader from "@components/Loader"
+import useLessons from "@Hooks/useLessons";
+import Loader from "@components/Loader";
+import MarkdownLinks from "@components/MarkdownLinks";
 
 const ListLessons = () => {
   const pathname = usePathname();
-  const lesson = pathname.split("/")[2] as lessonName;
+  const categoryLesson = pathname.split("/")[2] as categoryLessonName;
 
-  const { data, isPending, isError } = useLessons(lesson)
+  const { data, isPending, isError } = useLessons(categoryLesson);
 
   if (isPending) {
-    return <Loader/>;
+    return <Loader />;
   }
 
-  if(isError){
-    return 'Error'
+  if (isError) {
+    return "Error";
   }
-  
-  const markdowns = data
+
+  const metaAndNameLesson = data;
+
+  const pagesSlug = metaAndNameLesson.map((markdown) => {
+    if (!markdown.slug.includes("/")) return;
+
+    const [category] = markdown.slug.split("/");
+    return category;
+  });
+
+  const categorys = Array.from(new Set(pagesSlug));
 
   return (
     <div className="flex flex-col items-center justify-center xl:flex-row">
-      {lesson === "javascript" && (
+      {categoryLesson === "javascript" && (
         <Icon
           icon="skill-icons:javascript"
           className="mt-4 text-9xl xl:mr-20"
         />
       )}
-      {lesson === "typescript" && (
+      {categoryLesson === "typescript" && (
         <Icon
           icon="logos:typescript-icon-round"
           className="mt-4 text-9xl xl:mr-20"
         />
       )}
-      {lesson === "next" && (
+      {categoryLesson === "next" && (
         <Icon
           icon="teenyicons:nextjs-outline"
           className="mt-4 text-9xl xl:mr-20"
         />
       )}
-      {lesson === "fetch" && (
-        <Icon icon="tabler:api" 
-        className="mt-4 text-9xl xl:mr-20" />
+      {categoryLesson === "fetch" && (
+        <Icon icon="tabler:api" className="mt-4 text-9xl xl:mr-20" />
       )}
       <div className="flex flex-col items-center gap-10">
         <h1 className="m-4 text-jade11">
-          {lesson.charAt(0).toUpperCase() + lesson.substring(1)}
+          {categoryLesson.charAt(0).toUpperCase() + categoryLesson.substring(1)}
         </h1>
-        <section className="">
+        <section className="flex flex-col items-center">
           <h2 className="m-5 text-jade12">Catégories</h2>
-
-          <div className="m-4 mt-10 flex flex-col gap-4">
-            {markdowns?.map((markdown) => (
-              <Link
-                key={markdown.slug}
-                href={`/markdowns/${lesson}/${markdown.slug}`}
-                passHref
-              >
-                <div className="flex flex-col items-center xl:flex-row">
-                  <div className="flex min-w-full items-center justify-center rounded-lg border border-solid border-jade6 bg-jade3 p-4 text-jade11 hover:border-jade7 hover:bg-jade4 hover:text-jade12 xl:min-w-[400px]">
-                    {markdown.meta.title}
+          <div className="flex flex-col">
+            {categorys.map((category) => (
+              <>
+                {category !== undefined ? (
+                  <>
+                    <h3>{category}</h3>
+                    <div className="m-4 mt-10 flex flex-col gap-4">
+                      {metaAndNameLesson
+                        .filter(
+                          (lesson) =>
+                            lesson.slug.split("/")[0] === category,
+                        )
+                        .map((lesson) => (
+                         <MarkdownLinks key={`1_${lesson.slug}`} categoryLesson={categoryLesson} lesson={lesson}/>
+                        ))}
+                    </div>
+                  </>
+                ) : (
+                  <div className="m-4 mt-10 flex flex-col gap-4">
+                    {metaAndNameLesson.map((lesson) => (
+                       <MarkdownLinks key={`2_${lesson.slug}`} categoryLesson={categoryLesson} lesson={lesson}/>
+                    ))}
                   </div>
-                  <div className="pl-4 text-base">
-                    {markdown.meta.description}
-                  </div>
-                </div>
-              </Link>
+                )}
+              </>
             ))}
           </div>
         </section>

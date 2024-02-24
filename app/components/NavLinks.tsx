@@ -4,22 +4,19 @@ type NavLinksProps = {
   closeMenu: () => void;
 };
 
-export type lessonName = "typescript" | "next" | "fetch" | "javascript" | "";
-
 const NavLinks = ({ closeMenu }: NavLinksProps) => {
 
-  const lessons = ["javascript","typescript","fetch","next"]
+  const categorylessons = ["javascript","typescript","fetch","next"]
 
   return (
     <>
-
-      {lessons.map((lesson,idx) => (
+      {categorylessons.map((categoryLesson,idx) => (
         <li
-        key={`lesson${idx}`}
+        key={`categoryLesson${idx}`}
         className="cursor-pointer p-2 text-base font-bold sm:w-full sm:hover:bg-jade4 lg:w-4 lg:p-0 lg:hover:bg-transparent"
         onClick={() => closeMenu()}
       >
-        <Link href={`/markdowns/${lesson}/`}>{lesson.charAt(0).toUpperCase() + lesson.substring(1)}</Link>
+        <Link href={`/markdowns/${categoryLesson}/`}>{categoryLesson.charAt(0).toUpperCase() + categoryLesson.substring(1)}</Link>
       </li>
       ))}
     </>

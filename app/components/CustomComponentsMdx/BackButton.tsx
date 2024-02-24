@@ -1,15 +1,15 @@
 'use client'
 import { Icon } from "@iconify/react";
 import Link from "next/link";
-import { lessonName } from "@components/NavLinks";
+import { categoryLessonName } from "@utils/types";
 
 type BackButtonProps = {
-    lesson: lessonName
+    categoryLesson: categoryLessonName
 }
 
-const BackButton = ({lesson}: BackButtonProps) => {
+const BackButton = ({categoryLesson}: BackButtonProps) => {
     return (
-        <Link href={`/markdowns/${lesson}`}>
+        <Link href={`/markdowns/${categoryLesson}`}>
             <Icon icon="tabler:arrow-back-up-double" className="text-jade12" />
         </Link>
     );

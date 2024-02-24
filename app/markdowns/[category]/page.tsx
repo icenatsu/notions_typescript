@@ -1,15 +1,15 @@
 'use client'
 import { usePathname } from 'next/navigation'
-import { lessonName } from "@components/NavLinks";
+import { categoryLessonName } from "@utils/types";
 import ListLessons from "@components/ListLessons";
 
 const Page = () => {
     const pathname = usePathname()
-    const lesson = pathname.split('/')[2] as lessonName
+    const categoryLesson = pathname.split('/')[2] as categoryLessonName
 
     return (
         <>
-            {lesson !== "" && <ListLessons />}
+            {categoryLesson !== "" && <ListLessons />}
         </>
     );
 };

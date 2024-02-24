@@ -1,20 +1,20 @@
 import { useQuery } from "@tanstack/react-query";
 import { getLessons } from "@utils/getLessons";
 import { LessonsSchema } from "@utils/schemas";
-import { lessonName } from "../utils/types";
+import { categoryLessonName } from "@utils/types";
 
 // export const lessonKeys = {
 //     all: ["listLessons", { folder: lesson }]
 // };
 
-const useLessons = (lesson: lessonName) => {
+const useLessons = (categoryLesson: categoryLessonName) => {
     const usersKeys = {
-        all: ["listLessons", { folder: lesson }]
+        all: ["listLessons", { folder: categoryLesson }]
     }
 
     return useQuery({
         queryKey: usersKeys.all,
-        queryFn: async () => getLessons(lesson, LessonsSchema),
+        queryFn: async () => getLessons(categoryLesson, LessonsSchema),
     })
 };
 

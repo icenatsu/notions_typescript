@@ -7,25 +7,40 @@ import { visit } from "unist-util-visit";
 import { Pre } from "@components/PreComponent";
 import { ColoredHeading } from "@components/CustomComponentsMdx/ColoredHeading";
 import BackButton from "@/app/components/CustomComponentsMdx/BackButton";
-import { lessonName } from "@components/NavLinks";
+import { categoryLessonName } from "@utils/types";
 import remarkEmoji from "remark-emoji";
 import remarkGfm from "remark-gfm";
 
 // generateStaticParams remplace la fonction getStaticPaths et getStaticProps dans App router
 export async function generateStaticParams() {
-  const mdDir = fs.readdirSync(path.join("markdowns"));
+  const lessonsDirectory = fs.readdirSync("markdowns");
 
-  const paths = mdDir.flatMap((dir) => {
-    const files = fs.readdirSync(path.join("markdowns", dir));
+  const paths = lessonsDirectory.flatMap((categoryLesson) => {
+    
+    const contentLessonsDirectory = fs.readdirSync(path.join("markdowns", categoryLesson));
 
-    return files.map((filename) => ({
-      category: dir, // Catégorie représente le lien après /markdowns/[category]/
-      slug: filename.replace(".mdx", ""), // Slug représente le lien après /markdowns/[category]/[slug]
-    }));
+    return contentLessonsDirectory.flatMap((content) => {
+      const itemPath = path.join("markdowns", categoryLesson, content);
+      const isDirectory = fs.statSync(itemPath).isDirectory();
+
+      if (isDirectory) {
+        const directory = fs.readdirSync(itemPath);
+        return directory.map((subFilename) => ({
+          category: categoryLesson,
+          slug: [content, subFilename.replace(".mdx", "")],
+        }));
+      }
+
+      return {
+        category: categoryLesson,
+        slug: [content.replace(".mdx", "")],
+      };
+    });
   });
 
   return paths;
 }
+
 
 type getLessonsProps = {
   category: string;
@@ -33,10 +48,16 @@ type getLessonsProps = {
 };
 
 async function getLessons({ category, slug }: getLessonsProps) {
-  const markdownFile = fs.readFileSync(
-    path.join("markdowns", category, slug + ".mdx"),
-    "utf-8",
-  );
+
+    const markdownFile = slug.length > 1
+    ? fs.readFileSync(
+      path.join("markdowns", category, slug[0], slug[1] + ".mdx"),
+      "utf-8",
+    )
+    :fs.readFileSync(
+      path.join("markdowns", category, slug + ".mdx"),
+      "utf-8",
+    );
 
   const { data: fontMatter, content } = matter(markdownFile);
 
@@ -61,7 +82,7 @@ export default async function Page({ params }: any) {
       <div className="flex items-center justify-between">
         <h1 className="pt-10 text-jade11">{props.fontMatter.title}</h1>
         <span className="inline rounded-md border border-solid text-5xl hover:bg-jade4">
-          <BackButton lesson={props.category as lessonName} />
+          <BackButton categoryLesson={props.category as categoryLessonName} />
         </span>
       </div>
       <MDXRemote
