@@ -1,0 +1,31 @@
+---
+title: ServerLess Functions
+description: Le concept
+---
+
+## Serveur Standard
+
+- chaque request au serveur vont être traitée les une après les autres et les résoudre au fur à mesure des demandes dans l'ordre
+- A force cela va saturer la callstack et le serveur
+
+![standardServer](/serveurStandart.webp)
+![standardServer](/serveurStandart2.webp)
+
+## ServerLess
+
+- Lors du build est généré un fichier Javascript.
+- Lors du call au serveur, le serveur va récupérer ce fichier javascript et va run ce fichier
+- Ensuite il va renvoyer un résultat au client et le fichier Javascript va être supprimé
+- De cette manière le serveur sera libéré et pourra gérer une autre request
+
+- Chaque fichier javascript sera run indépendamment ce qui permet à n'importe quel serveur sur terre de run notre code juste en récupérer le fichier JS.
+
+![serverLess](/serverless.webp)
+![serverLess](/serverless2.webp)
+
+## Avantages/Inconvénients du serverless
+
+![avantage_inconvenient](/avantage_inconvenient.webp)
+
+
+

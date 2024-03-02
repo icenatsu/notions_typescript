@@ -1,0 +1,87 @@
+---
+title: Prisma
+description: ORM, c'est une 'interface' entre le code et la base de données sous forme d'objet
+---
+
+## Next generation ORM
+
+- Prisma se considère comme un NextGeneration ORM car il est basé sur des concepts différents. Déjà, il est full type safe en utilisant TypeScript avec des types qui sont générés lors du setup de Prisma.
+- Pour récupérer tous les books de tous les utilisateurs qui ont un nom de famille "Doe", on va faire :
+- [doc](https://www.prisma.io/docs/orm/reference/prisma-client-reference)
+
+<Pre>
+```ts
+const books = await prisma.book.findMany({
+  where: {
+    user: {
+      lastName: "Doe"
+    }
+  }
+})
+```
+</Pre>
+
+## Le schéma Prisma
+
+- Prisma possède un schéma prisma.schema qui est un fichier qui contient la définition de notre base de données. 
+- C'est un fichier qui est écrit en GraphQL et qui permet de définir les relations entre les tables.
+
+<Pre>
+```ts
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+}
+```
+</Pre>
+
+## Les Query Prisma
+
+<Pre>
+```ts
+const books = await prisma.book.findMany({
+  // Conditions de la requête
+  where: {
+    title: "Harry Potter"
+  },
+  // Données que l'on sélectionne (pour éviter de récupérer trop d'informations ou de les divulguer)
+  select: {
+    title: true,
+    id: true
+  }
+})
+
+// Il retourne l'utilisateur qui vient d'être créé avec uniquement le champ id
+const createdUser = await prisma.user.create({
+  // On passe en paramètre les données que l'on veut créer
+  data: {
+    name: "John Doe",
+    email: "john@gmail.com"
+  },
+  // On sélectionne uniquement le champ id
+  select: {
+    id: true
+  }
+});
+
+// Il retourne un objet du style { id: 1 } 
+const updatedComment = await prisma.comment.update({
+  // On va modifier que le commentaire qui a l'id 1
+  where: {
+    id: 1
+  },
+  // On va modifier le champ content
+  data: {
+    content: "Hello World"
+  },
+  // On sélectionne uniquement le champ id
+  select: {
+    id: true
+  }
+})
+
+```
+</Pre>
