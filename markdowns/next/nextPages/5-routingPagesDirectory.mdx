@@ -1,0 +1,118 @@
+---
+title: Le routing Pages Directory
+description: Le routing simple et dynamique
+---
+
+## Le routing simple
+
+### Créer une page dans NextJS 12
+
+- pages/index.tsx
+revient à faire http://localhost:3000/
+- pages/users/index.tsx
+revient à faire http://localhost:3000/users
+- pages/users/contact.tsx
+revient à faire http://localhost:3000/contact
+
+### Le composant Link
+
+- Link vas naviguer d'une page a une autre sans recharger la page et en gérant le cache
+- Si on ne met pas le composant Link on va provoquer le refetch de notre page sans utiliser la puissance de nextJS
+
+pointer vers une page: passhref permet de passer le href à notre élément a
+
+<Pre>
+```tsx
+<Link href="/" passHref>
+    <a>vers accueil</a>
+</Link>
+
+<Link href="/users" passHref>
+    <a>vers users</a>
+</Link>
+
+<Link href="/contact" passHref>
+    <a>vers contact</a>
+</Link>
+```
+</Pre>
+
+## Le routing dynamique
+
+### useRouter
+
+⚠️ disparait dans nextjs 13
+
+Ce hook permet de faire plusieurs actions :
+
+- router.push('/users/1') : Permet de naviguer vers la page /users/1
+- router.back() : Permet de revenir en arrière
+- router.query : Permet de récupérer les paramètres de la route
+
+- pages/users/[id].tsx revient à faire localhost:3000/users/1 ou localhost:3000/users/2 etc...
+
+editeur: écrire le lien complet dans un nouveau fichier établira la structure avec les dossiers/fichiers.
+
+### Exemple
+
+<Pre>
+```tsx title="pages/index.tsx"
+import type { NextPage } from 'next';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { FormEvent } from 'react';
+
+const Home: NextPage = () => {
+  const router = useRouter();
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
+
+    const username = String(formData.get('username')) ?? '';
+    const book = String(formData.get('book')) ?? '';
+
+    router.push(`/users/${username}/books/${book}`);
+  };
+
+  return (
+    <div className="flex flex-col items-center gap-4 m-4">
+      <h1 className="text-4xl">NextReact</h1>
+      <p>Template</p>
+      <form onSubmit={handleSubmit}>
+        <input name="username" placeholder="Username" className="border p-1" />
+        <input name="book" placeholder="Book" className="border p-1" />
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+  );
+};
+
+export default Home;
+```
+</Pre>
+
+<Pre>
+```tsx title="pages/users/[username]/books/[book].tsx"
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+
+export default function User() {
+  const router = useRouter();
+  const { username, book } = router.query;
+
+  return (
+    <div className="p-4">
+      <Link href="/" className="hover:underline text-blue-700">
+        Back
+      </Link>
+      <h1>
+        Hello {username} {book}
+      </h1>
+    </div>
+  );
+}
+```
+</Pre>
+

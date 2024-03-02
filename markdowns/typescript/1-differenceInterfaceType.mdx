@@ -1,0 +1,34 @@
+---
+title: Interface et Type
+description: Les différences
+---
+
+
+On ne peut pas déclarer 2 fois le même type alors que l'interface si
+
+<Pre>
+```ts
+// Erreur 
+type Bird = {
+  color: string;
+}
+
+type Bird = {
+  size: number;
+}
+
+const bird: Bird = { color: "red", size: 14 }
+
+// OK
+interface Bird = {
+  color: string;
+}
+
+interface Bird = {
+  size: number;
+}
+
+const bird: Bird = { color: "red", size: 14 }
+```
+</Pre>
+

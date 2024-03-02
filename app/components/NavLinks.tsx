@@ -5,19 +5,24 @@ type NavLinksProps = {
 };
 
 const NavLinks = ({ closeMenu }: NavLinksProps) => {
-
-  const categorylessons = ["javascript","typescript","fetch","next"]
+  const categorylessons = ["javascript", "typescript", "fetch", "next"];
 
   return (
     <>
-      {categorylessons.map((categoryLesson,idx) => (
+      {categorylessons.map((categoryLesson, idx) => (
         <li
-        key={`categoryLesson${idx}`}
-        className="cursor-pointer p-2 text-base font-bold sm:w-full sm:hover:bg-jade4 lg:w-4 lg:p-0 lg:hover:bg-transparent"
-        onClick={() => closeMenu()}
-      >
-        <Link href={`/markdowns/${categoryLesson}/`}>{categoryLesson.charAt(0).toUpperCase() + categoryLesson.substring(1)}</Link>
-      </li>
+          key={`categoryLesson${idx}`}
+          className="p-2 text-base font-bold sm:w-full sm:hover:bg-jade4 lg:w-4 lg:p-0 lg:hover:bg-transparent"
+          onClick={() => closeMenu()}
+        >
+          <Link
+            className="cursor-pointer"
+            href={`/markdowns/${categoryLesson}/`}
+          >
+            {categoryLesson.charAt(0).toUpperCase() +
+              categoryLesson.substring(1)}
+          </Link>
+        </li>
       ))}
     </>
   );

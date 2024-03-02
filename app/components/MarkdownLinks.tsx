@@ -2,7 +2,7 @@ import { categoryLessonName } from "@utils/types";
 import Link from "next/link";
 
 type MarkdownLinksProps = {
-  categoryLesson : categoryLessonName;
+  categoryLesson: categoryLessonName;
   lesson: {
     slug: string;
     meta: {
@@ -13,7 +13,6 @@ type MarkdownLinksProps = {
 };
 
 const MarkdownLinks = ({ categoryLesson, lesson }: MarkdownLinksProps) => {
-
   return (
     <Link
       href={`/markdowns/${categoryLesson}/${lesson.slug}`}

@@ -1,11 +1,11 @@
 import { Icon } from "@iconify/react";
 
 const Loader = () => {
-    return (
-        <div className="text-8xl flex justify-center items-center">
-            <Icon icon="eos-icons:bubble-loading" />
-        </div>
-    );
+  return (
+    <div className="mt-10 flex items-center justify-center text-8xl">
+      <Icon icon="eos-icons:bubble-loading" />
+    </div>
+  );
 };
 
 export default Loader;

@@ -16,8 +16,9 @@ export async function generateStaticParams() {
   const lessonsDirectory = fs.readdirSync("markdowns");
 
   const paths = lessonsDirectory.flatMap((categoryLesson) => {
-    
-    const contentLessonsDirectory = fs.readdirSync(path.join("markdowns", categoryLesson));
+    const contentLessonsDirectory = fs.readdirSync(
+      path.join("markdowns", categoryLesson),
+    );
 
     return contentLessonsDirectory.flatMap((content) => {
       const itemPath = path.join("markdowns", categoryLesson, content);
@@ -41,23 +42,22 @@ export async function generateStaticParams() {
   return paths;
 }
 
-
 type getLessonsProps = {
   category: string;
   slug: string;
 };
 
 async function getLessons({ category, slug }: getLessonsProps) {
-
-    const markdownFile = slug.length > 1
-    ? fs.readFileSync(
-      path.join("markdowns", category, slug[0], slug[1] + ".mdx"),
-      "utf-8",
-    )
-    :fs.readFileSync(
-      path.join("markdowns", category, slug + ".mdx"),
-      "utf-8",
-    );
+  const markdownFile =
+    slug.length > 1
+      ? fs.readFileSync(
+          path.join("markdowns", category, slug[0], slug[1] + ".mdx"),
+          "utf-8",
+        )
+      : fs.readFileSync(
+          path.join("markdowns", category, slug + ".mdx"),
+          "utf-8",
+        );
 
   const { data: fontMatter, content } = matter(markdownFile);
 

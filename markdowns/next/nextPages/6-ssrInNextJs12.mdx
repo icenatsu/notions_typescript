@@ -1,0 +1,74 @@
+---
+title: SSR dans nextjs 12
+description: getServerSideProps
+---
+
+## getServerSideProps
+
+<Pre>
+```tsx
+// On les affiche côté client
+type PageProps = {
+  text: string
+}
+
+// Notre page React envoyée à l'utilisateur
+// Ce code sera run coté serveur en récupérant les données et sera ensuite envoyée au client sous forme de html
+export default function Page({ text }: PageProps) {
+  return <div>{text}</div>
+}
+
+// On récupère les props côté serveur
+// ⚠️ Ce code n'est jamais envoyé au client !
+// Il est exécuté côté serveur et les props sont envoyées au composant (donc au client)
+export const getServerSideProps: GetServerSideProps<
+  ComponentProps
+> = async (context) => {
+  // 🦁 Récupérer les posts et les passer en props
+  return {
+    props: {
+      text: "Some text from the server 🤫"
+    },
+  };
+};
+```
+</Pre>
+
+### context
+
+- Récupérer un paramètre de l'url avec context
+- [doc](https://nextjs.org/docs/pages/api-reference/functions/get-server-side-props) (voir context, not found/redirect)
+- notFound : Si l'utilisateur n'existe pas, on renvoie une 404
+- redirect : Si l'utilisateur n'existe pas, on redirige vers une autre page
+
+<Pre>
+```tsx
+type PostIdProps = {
+  post: PostType;
+};
+
+const PostId: NextPage<PostIdProps> = ({ post }) => {
+  return <Post post={post} />;
+};
+
+export const getServerSideProps: GetServerSideProps<
+  PostIdProps,
+  { id: string }
+> = async (context) => {
+  const id = context.params?.id;
+
+  const res = await fetch(`https://jsonplaceholder.typicode.com/posts/${id}`);
+  const post = await res.json();
+
+  return {
+    props: {
+      post,
+    },
+  };
+};
+
+export default PostId;
+```
+</Pre>
+
+

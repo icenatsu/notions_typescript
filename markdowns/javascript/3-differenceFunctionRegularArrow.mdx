@@ -1,0 +1,75 @@
+---
+title: Les fonctions
+description: Différence Arrow/Regular function
+---
+
+## différences Regular/Arrow functions
+
+Avantages arrow fonction :
+- hoisting : le fait de ne pas pourvoir appeler une fonction avant sa déclaration
+- pas possible de redéclarer la fonction
+- this et arguments mieux utilisé dans arrow fonction 
+- plus moderne
+
+<Pre>
+```js
+// Regular : élément "magique" arguments 
+function regular() {
+    const [first, second] = arguments
+} 
+
+// Arrow : n'a pas cet argument magique (c'est mieux car on sait pas trop d'ou ça sort)
+```
+</Pre>
+
+
+2)
+
+<Pre>
+```js
+// Regular : on peut appeler la fonction AVANT qu'elle soit déclarée
+regular()
+
+function regular() {
+} 
+
+// Arrow : avec une Arrow fonction on ne peut pas (c'est mieux)
+```
+</Pre>
+
+
+3) 
+<Pre>
+```js
+// Arrow : simule un return
+const arrow = () => "Hello arrow"
+
+// Regular : obligé d'y insérer le return
+function regular() {
+    return "hello regular"
+} 
+```
+</Pre>
+
+4) 
+<Pre>
+```js
+// Regular : on peut rappeler la meme fonction et on va changer cette fonction dans l'exemple ça retournera natsu (meme si eslint prévient le code marchera quand même)
+function regular() {
+    return "hello regular"
+} 
+function regular() {
+    return "hello natsu"
+} 
+
+// Arrow : On pourra faire la même si et seulement si c'est une let, si c'est const on ne pourra pas 
+let arrow = () => "hello rackham" 
+arrow = () => { => "hello natsu"
+}
+```
+</Pre>
+
+- Pour les regular comme on peut les appeler avant leur déclaration, javascript va les classer par ordre de déclaration.
+- le console.log de la fonction regular correspondra à la dernière déclaration de la fonction regular dans le fichier ou qu'il soit placé
+- Pour les arrow les consoles.log correspondra à la première déclaration de la fonction au dessus de lui 
+	

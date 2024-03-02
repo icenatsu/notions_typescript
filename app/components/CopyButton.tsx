@@ -21,11 +21,19 @@ export const CopyButton = ({ text, lang }: CopyButtonProps) => {
   };
 
   return (
-      <div className="flex items-center absolute top-3 right-2 text-s">
-        <p className="">{lang}</p>
-        <figure className="text-md ml-2">
-          {isCopied ? "Copied!" : <Icon className="cursor-pointer ml-2" icon="mingcute:copy-line" onClick={copy} />}
-        </figure>
+    <div className="text-s absolute right-2 top-3 flex items-center">
+      <p className="">{lang}</p>
+      <figure className="text-md ml-2">
+        {isCopied ? (
+          "Copied!"
+        ) : (
+          <Icon
+            className="ml-2 cursor-pointer"
+            icon="mingcute:copy-line"
+            onClick={copy}
+          />
+        )}
+      </figure>
     </div>
   );
 };
