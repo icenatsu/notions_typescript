@@ -1,0 +1,135 @@
+---
+title: Le Lazy Loading
+description: no sé
+---
+
+## Le lazy loading peut être utile dans deux cas.
+    - Le premier, c'est si tu as un composant qui n'est utilisé que ponctuellement. Par exemple, une modal qui ne s'ouvre que après avoir cliqué sur un bouton. Si celle-ci est lourde, il peut être intéressant de la charger uniquement quand on a besoin de l'afficher.
+    - La deuxième utilisation, c'est si tu as une application complexe comme un Dashboard qui contient beaucoup de gros composants. Pour rendre ta page plus rapide, tu peux charger ces composants de manière séparée afin que la page s'affiche plus rapidement.
+
+<Pre>
+```jsx
+// Sans Lazy
+import LazyComponent from './LazyComponent'
+
+// Avec Lazy
+const LazyComponent = lazy(() => import('./LazyComponent'))
+
+```
+</Pre>
+
+Ce lazy React ne permettrait pas de pre-render les composants côté serveur... donc NextJS a créé son wrapper de lazy !
+
+## next/dynamic
+
+next/dynamic est un wrapper de lazy qui permet de faire du lazy loading côté serveur. Il va permettre de
+
+- Pre-render le composant côté serveur
+- Prendre en paramètre un loading qui est un composant qui sera affiché pendant le chargement du composant
+
+<Pre>
+```jsx
+import dynamic from 'next/dynamic'
+
+const LazyComponent = dynamic(() => import('./LazyComponent'), {
+  loading: () => <p>Chargement...</p>,
+  ssr: true, // Par défaut à true
+})
+```
+</Pre>
+
+Ce composant sera le même que les autres à la différence qu'il sera chargé après le chargement de la page.
+
+<iframe src="https://stackblitz.com/edit/nextjs-hzuhdr?embed=1&file=pages%2Findex.tsx" style={{ width: '100%', height: '500px' }}></iframe>
+
+- A observer avec le lazy loading : 
+![nextDynamic](/next_dynamic.webp)
+
+
+Dans quel cas mettre ssr à false?
+- Si ton composant ne fonctionne pas sans window (par exemple pour afficher une carte en fonction des coordonnées, il te faut l'accès à window)
+- Si ton composant n'affiche rien sans JavaScript
+
+<Pre>
+```tsx
+import dynamic from 'next/dynamic'
+
+const MyComponent = dynamic(() => import('./MyComponent'), { ssr: false });
+
+const Page = () => {
+  return (
+    <div>
+      {/* Le composant sera rendu côté client, où window est disponible */}
+      <MyComponent />
+    </div>
+  );
+};
+
+export default Page;
+
+////////
+
+import dynamic from 'next/dynamic';
+
+const MyComponent = dynamic(() => import('./MyComponent'), { ssr: false });
+
+const Page = () => {
+  return (
+    <div>
+      {/* Le composant ne sera rendu que côté client, où JavaScript est disponible */}
+      <MyComponent />
+    </div>
+  );
+};
+
+export default Page;
+```
+</Pre>
+
+Il peut être intéressant de venir charger le code de la modal uniquement lorque l'on on a besoin de l'afficher
+- ⚠️ Rendre un composant optionnel oblige à mettre le ssr à false (on peut le mettre à true mais il ne rendra plus coté serveur mais uniquement coté client et ne sera donc pas pris en compte)
+
+<Pre>
+```tsx
+import type { NextPage } from 'next';
+import dynamic from 'next/dynamic';
+import { useState } from 'react';
+import { PostType } from '../src/types/Post';
+
+type HomeProps = {
+  posts: PostType[];
+};
+
+const DialogDemoLazy = dynamic(() => import('../src/DialogDemo'), {
+  loading: () => <p>Loading...</p>,
+  ssr: false,
+});
+
+const Home: NextPage<HomeProps> = () => {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="flex flex-col items-center gap-4 m-4">
+      <button
+        className="inline-block rounded bg-indigo-600 px-8 py-3 text-sm font-medium text-white transition hover:scale-110 hover:shadow-xl focus:outline-none focus:ring active:bg-indigo-500"
+        onClick={() => setOpen((p) => !p)}
+      >
+        Open
+      </button>
+      {open && <DialogDemoLazy open={open} onOpenChange={setOpen} />}
+    </div>
+  );
+};
+
+export default Home;
+```
+</Pre>
+
+"pre-fetch"
+- Si on fait ceci lorsque l'on mettra la souris sur le bouton, celà va télécharger direct le composant
+- next/link fait la même chose par défaut.
+
+<Pre>
+```tsx
+<button onMouseEnter={() => import('./Modal')}>Open</button>
+```
+</Pre>
