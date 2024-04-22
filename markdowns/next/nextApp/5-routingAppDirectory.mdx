@@ -1,0 +1,136 @@
+---
+title: Le Routing de l'App Directory
+description: le routing dans app folder
+---
+
+## Le routing
+
+- Structure des dossiers : 
+    - /app/page.tsx ➡️ http://localhost:3000/
+    - /app/account/page.tsx ➡️ http://localhost:3000/account/
+
+## Le routing dynamique
+
+### useRouter
+
+Ce hook permet de faire plusieurs actions :
+
+- router.push('/users/1') : Permet de naviguer vers la page /users/1
+- router.back() : Permet de revenir en arrière
+- usePathname() : Permet de récupérer le pathname de la page 
+- useSearchParams(): Permet de récupérer le paramètre de la page
+
+<Pre>
+```ts
+'use client'
+ 
+import { usePathname, useSearchParams } from 'next/navigation'
+ 
+export default function ExampleClientComponent() {
+  const pathname = usePathname()
+  return <p>Current pathname: {pathname}</p>
+}
+
+export default function SearchBar() {
+  const searchParams = useSearchParams()
+ 
+  const search = searchParams.get('search')
+  // URL -> `/dashboard?search=my-project`
+  // `search` -> 'my-project'
+  return <>Search: {search}</>
+}
+```
+</Pre>
+
+### Structure
+
+- pages/users/[id].tsx revient à faire localhost:3000/users/1 ou localhost:3000/users/2 etc...
+
+editeur: écrire le lien complet dans un nouveau fichier établira la structure avec les dossiers/fichiers.
+
+- Structure des dossiers : 
+    - /app/dashbord/users/[userId] ➡️ http://localhost:3000/dashbord/users/1
+    - /app/account/page.tsx ➡️ http://localhost:3000/account/
+
+![structure](/structure_layout.webp)
+
+### Exemple : récupérer le userId de la page
+
+- app/dashbord/users/[userId]
+
+<Pre>
+```ts
+export default function page({
+    params
+  }: {
+    params: {
+      userId: string;
+    };
+  }) {
+
+    
+    return (
+      <div>
+        User id: {params.userId}
+      </div>
+    );
+  }
+```
+</Pre>
+
+### routes
+![routes_layoyt](/routes_layout.webp)
+
+- layout.tsx va appliquer un layout à toute une partie de nos routes.
+
+si /routes possède un fichier layout, toutes les pages qui sont dans /routes auront le layout appliqué :
+- /routes/users/page.tsx
+- /routes/invoices/page.tsx
+
+Si /routes possède un fichier error.tsx, toutes les pages qui sont dans /routes auront le error appliqué (le fichier error.tsx est un client component exclusivement)
+
+<Pre>
+```ts
+throw new Error("texte de l'erreur")
+```
+</Pre>
+
+<Pre>
+```ts title="error.tsx"
+"use client"
+
+// Error components must be Client Components
+import { useEffect } from "react"
+
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+
+export default function Error({
+  error,
+  reset,
+}: {
+  error: Error & { digest?: string }
+  reset: () => void
+}) {
+  useEffect(() => {
+    // Log the error to an error reporting service
+    console.error(error)
+  }, [error])
+
+  return (
+    <Card className="border-destructive bg-destructive/50">
+      <CardHeader>
+        <CardTitle>Something went wrong!</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Button onClick={() => reset()}>Try again</Button>
+      </CardContent>
+    </Card>
+  )
+}
+```
+</Pre>
+
+
+
+Si /routes possède un fichier loading.tsx, toutes les pages qui sont dans /routes auront le loading appliqué lorsque la page se charge

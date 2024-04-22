@@ -69,6 +69,7 @@ async function getLessons({ category, slug }: getLessonsProps) {
 }
 
 export default async function Page({ params }: any) {
+
   const props = await getLessons(params);
 
   const components = {

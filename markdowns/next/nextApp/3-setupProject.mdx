@@ -1,0 +1,554 @@
+---
+title: setup Project
+description: Possibilités pour setup un project sous NextJS avec tailwind
+---
+
+## Création du projet
+
+Projet:
+- Next
+- tailwind
+- Typescript
+- eslint
+
+<Pre>
+```ts title="terminal"
+pnpm create next-app@latest youcode --typescript --tailwind --eslint
+
+// ✔ Would you like to use `src/` directory? … No / Yes : No
+// ✔ Would you like to use App Router? (recommended) … No / Yes : Yes
+// ✔ Would you like to customize the default import alias? … No / Yes : No
+// ✔ What import alias would you like configured? … @/src/*
+```
+</Pre>
+<Pre>
+```ts title="tsconfig.json"
+"paths": {
+  "@/*": ["./src/*"]
+}
+```
+</Pre>
+
+## Shadcn UI
+
+- Bibliothèque de composants prédéfinis
+- [doc](https://ui.shadcn.com/docs/components/)
+
+<Pre>
+```ts title="terminal"
+pnpm dlx shadcn-ui@latest init
+
+// ✔ Would you like to use TypeScript (recommended)? … no / yes : yes
+// ✔ Which style would you like to use? › New York
+// ✔ Which color would you like to use as base color? › Neutral
+// ✔ Where is your global CSS file? … app/globals.css
+// ✔ Would you like to use CSS variables for colors? … no / yes : yes
+// ✔ Where is your tailwind.config.js located? … tailwind.config.js
+// ✔ Configure the import alias for components: … @/components
+// ✔ Configure the import alias for utils: … @/components/lib/utils
+// ✔ Are you using React Server Components? … no / yes : yes
+// ✔ Write configuration to components.json. Proceed? … yes
+```
+</Pre>
+
+## setup des env typesafe
+
+<Pre>
+```ts title="terminal"
+pnpm add @t3-oss/env-nextjs zod
+```
+</Pre>
+
+<Pre>
+```ts title="src/env.ts"
+import { createEnv } from "@t3-oss/env-next";
+import { z } from "zod";
+ 
+export const env = createEnv({
+  server: {
+    DATABASE_URL: z.string().url()
+  },
+  client: {
+    // Nothing here yet
+  },
+  // Maybe you can use just `runtimeEnv` if there is a MAJ. 
+  // Please follow the docs : https://env.t3.gg/docs/nextjs#create-your-schema
+  experimental__runtimeEnv: {
+    // Nothing here yet, we just need to put client env here
+  },
+});
+```
+</Pre>
+
+## setup de prisma
+
+- Il faut installer une base de données en local (postgreyql, mysql etc...)
+
+<Pre>
+```ts title="terminal"
+pnpm install prisma --save-dev  
+pnpx prisma init --datasource-provider postgresql
+```
+</Pre>
+
+<Pre>
+```ts title="src/lib/prisma.ts"
+import { PrismaClient } from '@prisma/client';
+
+const prismaClientSingleton = () => {
+  return new PrismaClient();
+};
+
+type PrismaClientSingleton = ReturnType<typeof prismaClientSingleton>;
+
+const globalForPrisma = globalThis as unknown as {
+  prisma: PrismaClientSingleton | undefined;
+};
+
+const prisma = globalForPrisma.prisma ?? prismaClientSingleton();
+
+export prisma;
+
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+```
+</Pre>
+
+## setup de nextAuth
+
+<Pre>
+```ts title="terminal"
+pnpm install next-auth @auth/prisma-adapter
+```
+</Pre>
+
+<Pre>
+```ts title="api/auth/[...nextauth]/route.ts"
+import { authOptions } from "@/utils/authOptions";
+import { NextApiRequest, NextApiResponse  } from "next";
+import NextAuth from "next-auth/next";
+
+function handler(req: NextApiRequest, res: NextApiResponse) {
+  return NextAuth(req, res, authOptions);
+}
+
+export { handler as GET, handler as POST };
+```
+</Pre>
+
+<Pre>
+```ts title="src/util/authOptions"
+import { PrismaAdapter } from "@auth/prisma-adapter";
+import { NextAuthOptions } from "next-auth";
+import GithubProvider from "next-auth/providers/github";
+import { Adapter } from "next-auth/adapters";
+import prisma from "@/lib/prisma";
+import { env } from '@/lib/env';
+
+const githubId = env.GITHUB_ID;
+const githubSecret = env.GITHUB_SECRET;
+
+console.log(githubId, githubSecret);
+
+
+if (!githubId || !githubSecret) {
+  throw new Error("Missing GITHUB_ID or GITHUB_SECRET environment variables");
+}
+
+export const authOptions: NextAuthOptions = {
+  adapter: PrismaAdapter(prisma) as Adapter,
+  theme: {
+    logo: "/public/images/logo-text.png"
+  },
+  providers: [
+    GithubProvider({
+      clientId: githubId,
+      clientSecret: githubSecret,
+    }),
+  ],
+  secret: process.env.NEXTAUTH_SECRET,
+  callbacks: {
+    session: async ({ session, user}) => {
+      if (!session?.user) return session;
+      session.user.id = user.id;
+      return session;
+    },
+  },
+
+  debug: process.env.NODE_ENV === "development",
+};
+```
+</Pre>
+
+<Pre>
+```ts title="/nextauth.d.ts"
+import type { DefaultSession } from 'next-auth';
+
+declare module 'next-auth' {
+  interface Session {
+    user: DefaultSession['user'] & {
+      /** The user's id address. */
+      id?: string;
+    };
+  }
+}
+```
+</Pre>
+
+<Pre>
+```ts title="/prima/schema.prisma"
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" // En fonction de la base de donnée utilisée
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id                    String  @id @default(cuid())
+  userId                String
+  type                  String
+  provider              String
+  providerAccountId     String
+  refreshTokenExpiresIn String?
+  refresh_token         String?
+  access_token          String?
+  expires_at            Int?
+  token_type            String?
+  scope                 String?
+  id_token              String?
+  session_state         String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@map("sessions")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  accounts      Account[]
+  sessions      Session[]
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verificationtokens")
+}
+```
+</Pre>
+
+<Pre>
+```ts title="src/lib/auth.ts"
+import { GetServerSidePropsContext, NextApiRequest, NextApiResponse } from 'next';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '../../pages/api/auth/[...nextauth]';
+
+type ParametersGetServerSession =
+  | []
+  | [GetServerSidePropsContext['req'], GetServerSidePropsContext['res']]
+  | [NextApiRequest, NextApiResponse];
+
+export const getAuthSession = async (...parameters: ParametersGetServerSession) => {
+  const session = await getServerSession(...parameters, authOptions);
+  return session;
+};
+```
+</Pre>
+
+## Theme et Provider
+
+<Pre>
+```ts title="src/lib/site-config.ts"
+export const SiteConfig = {
+  title: 'JustCode',
+  description: 'You JUST need to CODE.',
+} as const;
+```
+</Pre>
+
+- ThemeProvider (shadcn UI)
+
+<Pre>
+```ts title="src/componen/theme/ThemeProvider.tsx"
+"use client"
+import * as React from "react"
+import { ThemeProvider as NextThemesProvider } from "next-themes"
+import { type ThemeProviderProps } from "next-themes/dist/types"
+
+export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
+  return <NextThemesProvider {...props}>{children}</NextThemesProvider>
+}
+```
+</Pre>
+
+- ThemeToogle (shadcn UI)
+
+<Pre>
+```ts title="src/components/ThemeToggle"
+'use client';
+
+import { Button } from '@/components/ui/button';
+import { Moon, Sun } from 'lucide-react';
+import { useTheme } from 'next-themes';
+
+export function ThemeToggle() {
+  const { setTheme, theme } = useTheme();
+
+  return (
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+    >
+      <Sun className="h-[1.5rem] w-[1.3rem] dark:hidden" />
+      <Moon className="hidden h-5 w-5 dark:block" />
+      <span className="sr-only">Toggle theme</span>
+    </Button>
+  );
+}
+```
+</Pre>
+
+- Les composants polymorphes 
+
+<Pre>
+```ts title="src/components/ui/Typography"
+import { VariantProps, cva } from 'class-variance-authority';
+import type {
+  ComponentPropsWithoutRef,
+  ElementType,
+  PropsWithChildren,
+} from 'react';
+import { cn } from '@/lib/utils';
+
+
+// Permet de définir les différents type de as
+/*********************************************/
+type PolymorphicAsProp<E extends ElementType> = {
+  // Prend un paramètre générique 'E' qui doit être un élément type ou un dérivé
+  as?: 
+  // Propriétée as optionnelle
+    | E 
+      // ElementType un type d'élément html comme "div", "span", "p", "button" etc..
+    | React.ComponentType<Omit<ComponentPropsWithoutRef<E>, 'as'>>
+      // composant fonctionnel ou de classe. On exclue as de ces composants 
+      // cela garantit que le composant n'aura pas de props as qui pourront entrer en conflit avec celles utilisées pour déterminer le document html 
+    | React.FunctionComponent<Omit<ComponentPropsWithoutRef<E>, 'as'>>;
+      // composant fonctionnel même chose pour le as
+      // Exclure as est une mesure de sécurité. C'est au cas ou les props par défaut de l'élément E contiendrait as
+      // ça n'a rien à voir avec le as que l'on inclus dans <Typography as={...}
+};
+
+// Permet de définir que le type acceptera children, l'exclusion d'un possible as et les différents type de as
+/*************************************************************************************************************/
+type PolymorphicProps<E extends ElementType> = PropsWithChildren<
+// Cela signifie que le type PolymorphicProps peut contenir la prop children.
+  Omit<ComponentPropsWithoutRef<E>, 'as'> & PolymorphicAsProp<E>
+  // Et également que :
+  // On exclue le as possiblement existant des props par défaut du composant 
+  // Et on ajoute les valeurs possibles de as que l'on définit 
+>;
+
+// Permet de définir les classnames du variant
+/*********************************************/
+// const typographyVariants = cva('', { ... }): 
+// Crée un objet typography Variants 
+// en utilisant la fonction cva. 
+// Cette fonction prend deux arguments : 
+// - une chaîne vide '' qui représente la racine des classes CSS générées
+// - un objet de configuration.
+const typographyVariants = cva('', {
+  variants: {
+    variant: {
+      h1: 'scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl font-caption',
+      h2: 'scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0 font-caption',
+      h3: 'scroll-m-20 text-xl font-semibold tracking-tight font-caption',
+      p: 'leading-7 [&:not(:first-child)]:mt-6',
+      base: '',
+      quote: 'mt-6 border-l-2 pl-6 italic',
+      code: 'relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold',
+      lead: 'text-xl text-muted-foreground',
+      large: 'text-lg font-semibold',
+      small: 'text-sm font-medium leading-none',
+      muted: 'text-sm text-muted-foreground',
+      link: 'text-indigo-500 font-medium hover:underline',
+    },
+  },
+  // valeurs par défaut pour les variantes
+  defaultVariants: {
+    variant: 'base',
+  },
+});
+
+type TypographyCvaProps = VariantProps<typeof typographyVariants>;
+
+const defaultElement = 'p';
+
+// Ici on définit les balises (E) en fonction du variant si il est définit (si as est définit il prendra le dessus)
+/*************************************************************************/
+// Record : chaqye clef et associé a une valeur spécifique
+// - clefs : NonNullable<TypographyCvaProps['variant'] : (variants?: base, code, h1...)
+// - valeurs : Element type (div, span, p...)
+const defaultElementMapping: Record<
+  NonNullable<TypographyCvaProps['variant']>,
+  ElementType
+> = {
+  // h1 : clef, 'h1'; valeur
+  h1: 'h1',
+  h2: 'h2',
+  h3: 'h3',
+  p: 'p',
+  quote: 'blockquote' as 'p',
+  code: 'code',
+  lead: 'p',
+  large: 'p',
+  small: 'p',
+  muted: 'p',
+  link: 'a',
+  base: 'p',
+} as const; // Lecture seule
+
+
+// Typography prend un paramètre générique E qui étend ElementType et a une valeur par défaut égale à defaultElement.
+export function Typography<E extends ElementType = typeof defaultElement>({
+  as, // Si as est définit (soit un elementType soit un composant fonctionnel ou de classe comme Link par exemple). Si as="p" alors la balise sera p mais si variant est h3 il auraa toujours les classnames du h3
+  children, // Enfant de E
+  className, // Si une ou des classnames sont définies
+  variant, // variant (h2, h3, p, ...) avec les classname associées dans typographyVariants
+  ...restProps // Par exemple pour un lien href
+}: PolymorphicProps<E> & TypographyCvaProps) {
+
+   // E sera soit as soit variant soit p (defaultElement) 
+  const Component: ElementType =
+    as ?? defaultElementMapping[variant ?? 'base'] ?? defaultElement;
+
+  
+    // si as existe (exemple: {Link}) alors ce sera un lien. Si variant est présent il prend les classnames du variant
+    // si as n'existe pas alors le composant sera le variant si il existe. Donc si c'est un h3 avec les classnames
+    // Si as n'existe pas et que le variant non plus alors ce sera le defaultElement donc un p sans classname (sauf si ajoutées) puisque pas de variant
+    
+  return (
+    <Component
+      {...(restProps as ComponentPropsWithoutRef<E>)}
+      className={cn(typographyVariants({ variant }), className)}
+    >
+      {children}
+    </Component>
+  );
+}
+```
+</Pre>
+
+<Pre>
+```ts title="app/Providers"
+'use client';
+
+import { SessionProvider } from 'next-auth/react';
+import { ThemeProvider } from 'next-themes';
+import { PropsWithChildren } from 'react';
+import { Toaster } from 'sonner';
+
+export const Providers = ({ children }: PropsWithChildren) => {
+  return (
+    <>
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <Toaster />
+        <SessionProvider>{children}</SessionProvider>
+      </ThemeProvider>
+    </>
+  );
+};
+```
+</Pre>
+
+<Pre>
+```ts title="app/layout"
+import { Footer } from '@/components/layout/Footer';
+import { Header } from '@/components/layout/Header';
+import { TailwindIndicator } from '@/components/utils/TailwindIndicator';
+import { SiteConfig } from '@/lib/site-config';
+import { cn } from '@/lib/utils';
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import { PropsWithChildren } from 'react';
+import { Providers } from './Providers';
+import './globals.css';
+
+const fontSans = Inter({ subsets: ['latin'], variable: '--font-sans' });
+
+export const metadata: Metadata = {
+  title: SiteConfig.title,
+  description: SiteConfig.description,
+};
+
+export default function RootLayout({ children }: PropsWithChildren) {
+  return (
+    <>
+      <html lang="en" className="h-full" suppressHydrationWarning>
+        <head />
+        <body
+          className={cn(
+            'h-full bg-background font-sans antialiased',
+            fontSans.variable
+          )}
+        >
+          <Providers>
+            <div className="relative flex min-h-screen flex-col">
+              <Header />
+              <div className="flex-1">{children}</div>
+              <Footer />
+            </div>
+            <TailwindIndicator />
+          </Providers>
+        </body>
+      </html>
+    </>
+  );
+}
+```
+</Pre>
+
+## eslint Tailwind Plugin
+
+<Pre>
+```ts title="terminal"
+pnpm install -D eslint-plugin-tailwindcss
+```
+</Pre>
+
+<Pre>
+```ts title="eslint.json"
+{
+  "extends": ["next/core-web-vitals", "plugin:tailwindcss/recommended"],
+  "rules": {
+    "@next/next/no-html-link-for-pages": "off",
+    "react/jsx-key": "off",
+    "tailwindcss/no-custom-classname": "off"
+  }
+}
+```
+</Pre>
+
+

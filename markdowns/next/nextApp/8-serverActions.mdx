@@ -1,0 +1,306 @@
+---
+title: Les Server Actions
+description: fonctionnement
+---
+
+## Fonctionnement
+
+![severAction](/server_action.webp)
+
+## Créer des actions
+
+### Dans un fichier indépendant (actions.ts)
+
+Il faut :
+- utiliser 'use server'
+- que chaque fonctions soient asynchrones
+
+<Pre>
+```ts
+"use server"
+
+export const updatePost = async (id: string, data: PostData) => {
+  // TODO
+}
+
+export const deletePost = async (id: string) => {
+  // TODO
+}
+```
+</Pre>
+
+### Dans un server component
+
+Il faut :
+- que la fonction soit asynchrone
+- que la première ligne du corps de la fonction soit 'use server'
+- ⚠️ Attention ses server action ne seront disponibles uniquement que dans ce server component 
+
+<Pre>
+```tsx
+export default async function Component({ id }: { id: string }) {
+  const updatePost = async (data: FormData) => {
+    "use server";
+    // TODO
+  }
+
+  const deletePost = async () => {
+    "use server";
+    // TODO
+  }
+
+  return (
+    // ...
+  )
+}
+```
+</Pre>
+
+## Utiliser les actions
+
+### Dans un server component
+
+- Le tag form prend, en React, la props action qui va nous permettre de faire un appel à une action.
+
+<Pre>
+```tsx
+export default async function Component() {
+  
+  const updateUser = async (data: FormData) => {
+    "use server";
+    
+    const email = data.get("email");
+    const password = data.get("password");
+  }
+
+  const deleteUser = async () => {
+    "use server";
+    // TODO
+  }
+
+  return (
+    <form action={updateUser}>
+      <input name="email" />
+      <input name="password" />
+      <button type="submit" />
+    </form>
+  )
+}
+```
+</Pre>
+
+On va aussi pouvoir créer des actions directement sur des boutons quand il n'y a pas besoin d'information. 
+Pour cela, on va devoir utiliser des button à l'intérieur de form et utiliser la props formAction :
+
+<Pre>
+```tsx
+export default async function Component() {
+  const deleteUser = async () => {
+    "use server";
+    // TODO
+  }
+
+  return (
+    <form>
+      <button formAction={deleteUser}>Delete</button>
+    </form>
+  )
+}
+```
+</Pre>
+
+- On utilise rarement ces méthodes car comme on est dans un server component on ne sera pas capable d'afficher ce que l'on veut.
+- En général on l'utilise pour des redirections dans des server action
+
+<Pre>
+```tsx
+import { redirect } from "next/navigation";
+
+export default async function Component() {
+  const deleteUser = async () => {
+    "use server";
+    await redirect("/posts");
+  }
+
+  return (
+    <form>
+      <button formAction={deleteUser}>Delete</button>
+    </form>
+  )
+}
+```
+</Pre>
+
+### Dans un client component
+
+Pour les RCC, il faudra séparer les actions dans un fichier distinct. 
+En effet, les actions dans les RCC ne peuvent pas être déclarées dans le corps de la fonction.
+
+<Pre>
+```tsx title="actions.ts"
+"use server"
+
+export const updateUser = async (id: string, data: PostData) => {
+  // TODO
+}
+
+export const deleteUser = async (id: string) => {
+  // TODO
+}
+```
+</Pre>
+
+<Pre>
+```tsx
+import { updatePost, deletePost } from "./actions";
+
+export default function Component({ id }: { id: string }) {
+
+  const handleSubmit = async (formData: FormData) => {
+    await updatePost(id, {
+      email: formData.get("email"),
+      password: formData.get("password"),
+    });
+    alert("User updated !")
+  }
+
+  return (
+    <form onSubmit={e => {
+      e.preventDefault();
+      handleSubmit(new FormData(e.target as HTMLFormElement));
+    }}>
+      <input name="email" />
+      <input name="password" />
+      <button type="submit" />
+    </form>
+  )
+}
+```
+</Pre>
+
+- On peut utiliser useMutation pour gérer les loadings et les erreurs
+
+<Pre>
+```tsx
+import { useMutation } from "react-query";
+import { updatePost, deletePost } from "./actions";
+
+export default function Component({ id }: { id: string }) {
+  const mutation = useMutation(updatePost);
+
+  const handleSubmit = async (formData: FormData) => {
+    await mutation.mutateAsync(id, {
+      email: formData.get("email"),
+      password: formData.get("password"),
+    });
+    alert("User updated !")
+  }
+
+  if (mutation.isLoading) return <div>Loading...</div>
+
+  if (mutation.isError) return <div>Error: {mutation.error}</div>
+
+  return (
+    <form onSubmit={e => {
+      e.preventDefault();
+      handleSubmit(new FormData(e.target as HTMLFormElement));
+    }}>
+      <input name="email" />
+      <input name="password" />
+      <button type="submit" />
+    </form>
+  )
+}
+```
+</Pre>
+
+### Gestion des erreurs 
+
+- throw arrêtera l'éxécution de la fonction mais l'erreur ne sera visible qu'en mode dev car en mode production une erreur générique sera visible
+
+<Pre>
+```tsx
+export const updatePost = async (id: string, data: PostData) => {
+  if (!data.email) throw new Error("Email is required");
+  if (!data.password) throw new Error("Password is required");
+
+  // TODO
+}
+```
+</Pre>
+
+- Pour quelle soit visible en mode production
+
+<Pre>
+```tsx
+export type ServerActionReturn<T> = {
+  success: true,
+  data: T 
+} | {
+  success: false,
+  error: Error
+}
+
+export const updatePost = async (id: string, data: PostData): ServerActionReturn<"string"> => {
+  if (!data.email) return { success: false, error: new Error("Email is required") };
+  if (!data.password) return { success: false, error: new Error("Password is required") };
+
+  return { success: true, data: "Hello" };
+}
+```
+</Pre>
+
+- Puis dans l'utilisation, avec useMutation on va pouvoir récupérer l'erreur :
+
+<Pre>
+```tsx
+import { useMutation } from "react-query";
+
+export default function Component({ id }: { id: string }) {
+  const mutation = useMutation(async (data: FormData) => {
+    const result = await updatePost(id, {
+      email: formData.get("email"),
+      password: formData.get("password"),
+    });
+
+    if (!result.success) {
+      // do something
+      throw result.error;
+    } else {
+      // do something
+      return result.data;
+    }
+  });
+
+  const handleSubmit = async (formData: FormData) => {
+    const result = await mutation.mutateAsync({
+      email: formData.get("email"),
+      password: formData.get("password"),
+    });
+
+    if (!result.success) {
+      alert(result.error.message);
+    } else {
+      alert("User updated !")
+    }
+  }
+
+  if (mutation.isLoading) return <div>Loading...</div>
+
+  if (mutation.isError) return <div>Error: {mutation.error}</div>
+
+  return (
+    <form onSubmit={e => {
+      e.preventDefault();
+      handleSubmit(new FormData(e.target as HTMLFormElement));
+    }}>
+      <input name="email" />
+      <input name="password" />
+      <button type="submit" />
+    </form>
+  )
+}
+```
+</Pre>
+
+

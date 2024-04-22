@@ -1,0 +1,252 @@
+---
+title: Les Safe Actions
+description: Problèmes liés au server Action
+---
+
+## Pas TypeSafe
+
+Tous les paramètres que l'on définit pour nos Server Actions avec TypeScript ne sont pas du tout garantis.
+Il faut donc faire attention à ce que l'on envoie et à ce que l'on reçoit.
+
+<Pre>
+```tsx
+"use server"
+
+export const myAction = (
+  someParams: { id: string } // Peut être une string, un number ou n'importe quoi ⚠️ 👇
+) => {
+  // ...
+}
+```
+</Pre>
+
+## Gestion d'erreur compliquée
+
+Quand on throw erreur on va faire crasher nos servers actions :
+
+- on ne pourra pas rémonter l'information au client => erreur générique 500
+
+<Pre>
+```tsx
+"use server"
+
+export const myAction = (id: string) => {
+  if (typeof id !== "string") {
+    throw new Error("Your id must be a string")
+  }
+
+  if (id === "") {
+    throw new Error("Your id must NOT be empty.")
+  }
+
+  return "ok"
+}
+
+// oblige à faire ceci :
+
+"use server"
+
+export const myAction = (id: string) => {
+  if (typeof id !== "string") {
+    return {
+      ok: false,
+      error: "Your id must be a string"
+    }
+  }
+
+  if (id === "") {
+    return {
+      ok: false,
+      error: "Your id must NOT be empty."
+    }
+  }
+
+  return {
+    ok: true,
+    data: "ok"
+  }
+}
+```
+</Pre>
+
+## Middleware
+
+Parfois, on veut souvent savoir quel utilisateur est en train de faire une action avant de laisser l'utilisateur la faire.
+En l'occurrence, on doit constamment faire la même chose dès que l'on veut vérifier que l'utilisateur est connecté :
+
+<Pre>
+```tsx
+export const someAction = () => {
+  const session = await getAuthSession();
+
+  const userId = session?.user.id;
+
+  if (!userId) {
+    throw new Error("You're not logged in. Please log in to continue.");
+  }
+
+  // ...
+}
+```
+</Pre>
+
+Pour résoudre tous les problèmes précédemment vus on utilisera next-safe-action
+
+# Next safe action
+
+- Voir la doc: [Next-safe-action](https://next-safe-action.dev/docs/getting-started)
+
+## Création de l'action
+
+<Pre>
+  ```tsx title="action.ts"
+  import {createSafeActionClient} from "next-safe-action"; 
+  
+  export const action = createSafeActionClient(); 
+  ```
+</Pre>
+
+## On règle le premier problème : TypeSafe
+
+Cette action prend 2 paramètres :
+  - schéma
+  - la fonction qui renvoie les props
+
+<Pre>
+```tsx
+import { action } from "./action";
+
+export const someAction = action(
+  z.object({
+    id: z.string(),
+    name: z.string(),
+  })
+  ({ id, name }) => {
+    // Si on arrive ici, c'est que id et name sont bien des strings
+  }
+)
+```
+</Pre>
+
+Maintenant, chaque fois que notre action est appelée, on va pouvoir être sûr que les paramètres sont bien du type qu'on attend.
+
+## On règle le deuxième problème : La gestion des erreurs
+
+On crée notre fonction du retour d'erreur avec :
+  - error.message qui correspondra au message d'erreur que l'on souhaite remonter au client
+  - un message d'erreur par défaut  
+
+<Pre>
+```tsx
+export class ActionError extends Error {}
+
+export const action = createSafeActionClient({
+  handleReturnedServerError: (error) => {
+  // retourne le message d'erreur 
+  if (error instanceof ActionError) {
+    return error.message,
+  }
+  // message de retour d'erreur par défaut
+   return 'Something went wrong!',
+});
+```
+</Pre>
+
+- Ensuite on pourra créer notre action en gérant les différents messages d'erreurs qui seront remontés au client
+
+<Pre>
+```tsx
+import { z } from 'zod';
+import { ActionError, action } from './safe-action';
+
+export const deleteUser = action(z.string(), async (userId) => {
+  if (userId === 'error') {
+    throw new ActionError("UserId can't be equal to error.");
+  }
+
+  if (userId === 'melvyn') {
+    throw new ActionError("UserId can't be equal to melvyn !!");
+  }
+
+  return 'User is deleted.';
+});
+```
+</Pre>
+
+Puis dans notre client component, on va pouvoir récupérer la serverError si elle existe pour gérer les cas d'erreur :
+
+<Pre>
+```tsx
+'use client';
+
+import { Button } from '@/components/ui/button';
+import { deleteUser } from './next-safe-action/delete-user';
+import { useState } from 'react';
+import { Input } from '@/components/ui/input';
+
+export const DeleteUserForm = () => {
+  const [userId, setUserId] = useState('0');
+
+  return (
+    <div className="flex flex-wrap gap-2">
+      <Input value={userId} onChange={(e) => setUserId(e.target.value)} />
+      <Button
+        onClick={async () => {
+          const result = await deleteUser(userId);
+
+          if (result.serverError) {
+            alert('Error with message' + result.serverError);
+            return;
+          }
+
+
+
+            alert('Succès avec le message : ' + result.data);
+        }}
+      >
+        Supprimer l'utilisateur
+      </Button>
+    </div>
+  );
+};
+```
+</Pre>
+
+## On règle le dernier problème : Les middlewares
+
+Finalement, nous voudrons souvent créer des actions "uniquement pour les utilisateurs connectés" ou pour d'autres types d'applications "uniquement pour les administrateurs".
+
+<Pre>
+```tsx
+export const authenticatedAction = createSafeActionClient({
+  async middleware() {
+    const session = await getAuthSession();
+
+    const userId = session?.user.id;
+
+    if (!userId) {
+      throw new Error("Tu n'es pas connecté. Merci de te connecter pour continuer.");
+    }
+
+    return {
+      userId,
+    };
+  },
+});
+```
+</Pre>
+
+La conséquence est que nous allons facilement pouvoir utiliser le userId et être sûr que celui-ci est défini :
+
+<Pre>
+```tsx
+export const deleteCourse = authenticatedAction(
+  z.string(),
+  //            👇 Récupéré de notre middleware
+  (courseId, { userId }) => {
+    // vérification que l'utilisateur est bien le propriétaire du cours
+  }
+)
+```
+</Pre>
+

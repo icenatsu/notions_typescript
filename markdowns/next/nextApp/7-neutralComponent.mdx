@@ -1,0 +1,44 @@
+---
+title: Les Neutral Components
+description: fonctionnement
+---
+
+## Différences
+
+RSC ➡️ Server Component 
+- async
+
+RCC ➡️ Client Component
+- Il commence par "use client"
+- Il possède un hook (useState, etc...)
+- Il possède un événement (onClick)
+- Il interagit avec le document (document.navigation par exemple)
+
+RNC ➡️ Neutral Component
+- Aucune des spécifités de RSC et RCC 
+
+Un neutral Component sera rendu en fonction du context.
+
+<iframe style={{ width: '100%', height: '500px' }} src='https://stackblitz.com/edit/nr-nextjs13-j8g8gc?embed=1&file=app%2Fpage.tsx'></iframe>
+
+## Nuance
+
+<Pre>
+```tsx
+export const SomeComponent = () => {
+  const [state, setState] = useState(0)
+
+  return (
+    <div onClick={() => setState(c => c + 1)}>
+      Some component {state}...
+    </div>
+  )
+}
+```
+</Pre>
+
+- Bien que SomeComponent possède un useState, SomeComponent est un Neutral Component
+    - car il n'indique pas explicitement s'il doit être traité 
+        - comme un Client Component (RCC) ➡️ 'use client'
+        - ou un Server Component (RSC) ➡️ async
+    - Il est donc considéré comme neutre jusqu'à ce qu'on décide de son contexte d'exécution.

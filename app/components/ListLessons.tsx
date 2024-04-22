@@ -10,6 +10,7 @@ import Error from "@components/Error";
 
 const ListLessons = () => {
   const pathname = usePathname();
+
   const categoryLesson = pathname.split("/")[2] as categoryLessonName;
 
   const { data, isPending, isError, refetch } = useLessons(categoryLesson);

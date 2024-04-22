@@ -1,0 +1,80 @@
+---
+title: serveur Components (RSC)
+description: explications et concept
+---
+
+Les serveurs components ont là même façon de fonctionner que le SSR à la différence près 
+- qu'avec le SSR au moment du chargement du fichier Javascript, il sera beaucoup plus petit car il ne contient que les client Components.
+- Avant il contenait tous les éléments y compris les éléments non dynamiques   
+- Dans la foulée l'hydratation sera donc beaucoup plus rapide
+
+![serverComponent](/servercomponents.webp)
+
+console.log()
+- Dans le terminal ➡️ coté serveur
+- Dans le navigateur ➡️ coté client 
+
+<Pre>
+```tsx
+'use client' 
+// Ce composant sera côté client
+```
+</Pre>
+
+<Pre>
+```tsx
+// Ce composant sera côté serveur ce qui nous permet de rendre le composant asynchrone si on le souhaite
+// par contre on ne pourra pas utiliser 
+// - des eventHandler (comme onClick, onSubmit etc...) car ça ne s'utilise pas dans les servers components
+// - les hooks (useState...)
+// - interragir avec le dom comme accéder à l'objet window accessible uniquement depuis le client ou encore document
+
+// La raison, c'est que les serveurs components ne sont pas hydratés et donc aucun JavaScript ne sera envoyé au client
+
+const Component = async () => {
+
+  const test = await ....  
+
+  return (
+    <div>
+      
+    </div>
+  );
+};
+
+export default Component;
+```
+</Pre>
+
+Il n'est vraiment pas recommandé de faire des requêtes à la base de données du côté client... 
+Les servers components permettent derécupérer exactement les données dont on as besoin
+
+- En interrogeant la base de données
+<Pre>
+```tsx
+import { prisma } from "@/lib/prisma";
+
+export default async function ServerComponent() {
+  // Cette ligne de code va récupérer les utilisateurs directement dans ta base de données
+  const data = await prisma.user.findMany();
+  return <div>{data}</div>;
+}
+```
+</Pre>
+
+- En interrogeant l'API
+<Pre>
+```tsx
+export default async function ServerComponent() {
+  const data = await fetch("https://api.github.com/users/YouCodeSH").then((res) => res.json());
+  return <div>{data}</div>;
+}
+```
+</Pre>
+
+Avant pour faire ça, il aurait fallu :
+
+- Créer une route API qui récupère les données
+- Créer un composant
+- Utiliser react-query pour faire une requête à notre API
+- Afficher un loader en attendant puis afficher les données une fois reçues (et les valider, car on ne fait jamais confiance à l'API)

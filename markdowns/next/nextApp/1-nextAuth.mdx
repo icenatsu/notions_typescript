@@ -3,4 +3,84 @@ title: NextAuth
 description: système d'authentification
 ---
 
-<iframe style={{ width: '100%', height: '500px' }} src="https://www.youtube.com/embed/TsVFEtj_Jrw?si=D65N5T13xhyeYRTP" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+## Fonctionnement
+
+- NextAuh est une librairie qui va permettre de gérer l'authentification
+
+Il gère les 
+- JWT
+- sessions
+- cookies
+- providers (Google, Facebook, Twitter, GitHub, etc...)
+- e-mails
+- Il est configurable avec nextAuthconfig (authoptions)
+
+NextAuth fonctionne avec deux éléments principaux:
+- providers : services que l'on va relier à nextauth 
+	- email (magik link)
+	- OAuth Providers (github, google)
+	- credentials (identifiants/password)
+- adapter: connecter nextauth et transformer les actions qu'il génère en code javascript compris par l'ORM prisma qui va ensuite générer une requête SQL à notre database
+
+[Vidéo melvynx](https://www.youtube.com/embed/TsVFEtj_Jrw?si=D65N5T13xhyeYRTP)
+
+<Pre>
+```ts
+import { env } from '@/lib/env';
+import { prisma } from '@/lib/prisma';
+import { PrismaAdapter } from '@next-auth/prisma-adapter';
+import NextAuth, { AuthOptions } from 'next-auth';
+import GithubProvider from 'next-auth/providers/github';
+
+export const authOptions: AuthOptions = {
+  adapter: PrismaAdapter(prisma),
+  providers: [
+    GithubProvider({
+      clientId: env.GITHUB_ID,
+      clientSecret: env.GITHUB_SECRET,
+    }),
+  ],
+};
+
+```
+</Pre>
+
+## Les sessions
+
+1- L'utilisateur se connecte
+
+2- Si l'utilisateur 
+- à déjà un compte
+
+	- cherche son compte et se connecte avec
+
+- n'a pas de compte
+
+	- création du compte dans la database et se connecte avec
+
+3- Dès qu'on a un compte 
+
+	- création d'une session
+
+<Pre>
+```js
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+```
+</Pre>
+
+4- Seul le sessionToken sera envoyé dans un cookie qui sera stocké par l'utilisateur
+
+5- Ensuite a chaque fois que l'utilisateur se connectera il enverra ce cookie au serveur qui renverra les données relatives dans la base de donnée au sessionToken
+
+⚠️ En production, il faut configurer NEXTAUTH_SECRET, sinon il y'aura avoir des erreurs ! 
+
+- callbacks : ajouter certains paramètres à la session
+- events : Venir réagir à des évènements comme createUser, updateUser, signIn, etc... On va pouvoir faire des actions lorsque ces événements se produisent.
+- pages : Par défaut, NextAuth va créer une série de pages comme celle de Login. Mais tu peux utiliser tes propres pages avec ce paramètre.
+

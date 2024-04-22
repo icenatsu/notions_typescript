@@ -1,0 +1,84 @@
+---
+title: Les Client Components
+description: fonctionnement
+---
+
+## client component "opt-in" ➡️ 'use client'
+
+- On hydrate uniquement les client components
+- Si un composant possède des éléments javascript si le fichier n'est pas opt-in ➡️ erreur
+- Si un composant est un client components tous ces enfants le seront même sil n'ont pas 'use client'
+- Si on essaye d'importer un composant client dans un server component ➡️ erreur
+- Il n'est pas possible de récupérer des données de manière asynchrone dans un client component
+- Il est possible :
+  - utiliser onClick etc...
+  - utiliser des hooks
+  - interagir avec le DOM
+  - utiliser des librairies qui ne sont pas compatibles avec SSR
+
+Par défaut tous les composants sont des server Components
+
+## Fonctionnement des client Component
+
+![client_component](/clientComponents.webp)
+
+1. pré-rendu côté serveur, 
+2. HTML envoyé au client, 
+3. Hydraté côté client.
+
+## Rendre un server component dans un client component avec children
+
+<Pre>
+```ts title="composant client component"
+"use client";
+
+type ClientComponentProps = {
+  children: React.ReactNode;
+};
+
+const ClientComponent = ({ children }: ComponentProps) => {
+  return <div>{children}</div>
+};
+
+export default ComponentClient;
+```
+</Pre>
+
+<Pre>
+```ts title="composant server component"
+
+const ServerComponent = () => {
+  return <div>coucou</div>;
+};
+
+export default ServerComponent;
+```
+</Pre>
+
+<Pre>
+```ts title="rendre server component dans un client component"
+
+type OtherComponentServerProps = {
+  children: React.ReactNode;
+};
+
+const OtherComponentServer = () => {
+  return( 
+    <ClientComponent>
+        <ServerComponent>
+    </ClientComponent>
+  )
+};
+
+export default OtherComponentServerProps;
+```
+</Pre>
+
+Les RCC vont être rendu une fois côté server puis côté client ils seront hydratés avec leurs équivalent Javascript
+
+![hydratation](/hydratation.webp)
+
+<iframe src="https://stackblitz.com/edit/nextjs13-nvj7zt?embed=1&file=app%2Fusers%2F%5BuserId%5D%2FUserForm.tsx" style={{ width: '100%', height: '500px' }}></iframe>
+
+
+<iframe style={{ width: '100%', height: '500px' }} src='https://dbdiagram.io/e/65f71f12ae072629ce38b7d7/65f7202fae072629ce38c4c3'></iframe>
