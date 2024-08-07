@@ -57,3 +57,16 @@ code {
 span {
   white-space: pre-wrap;
 }
+
+pre {
+ padding: 0.3rem 1rem !important;
+}
+
+figure {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+hr {
+  margin: 0 !important;
+}

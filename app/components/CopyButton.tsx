@@ -21,19 +21,22 @@ export const CopyButton = ({ text, lang }: CopyButtonProps) => {
   };
 
   return (
-    <div className="text-s absolute right-2 top-3 flex items-center">
-      <p className="">{lang}</p>
-      <figure className="text-md ml-2">
-        {isCopied ? (
-          "Copied!"
-        ) : (
-          <Icon
-            className="ml-2 cursor-pointer"
-            icon="mingcute:copy-line"
-            onClick={copy}
-          />
-        )}
-      </figure>
-    </div>
+    <>
+      <div className="flex justify-between items-center rounded-sm px-4">
+        <p className="">{lang}</p>
+        <figure className="text-md flex flex-col">
+          {isCopied ? (
+            "Copied!"
+          ) : (
+            <Icon
+              className="ml-2 cursor-pointer"
+              icon="mingcute:copy-line"
+              onClick={copy}
+            />
+          )}
+        </figure>
+      </div>
+      <hr className="bg-slate-100"/>
+    </>
   );
 };

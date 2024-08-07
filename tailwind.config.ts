@@ -19,6 +19,7 @@ const config: Config = {
         "inter": "var(--font--inter)",
       },
       colors: {
+        grey: '#1F2028',
         transparent: 'transparent',
         jade1: '#0d1512',
         jade2: '#121c18',

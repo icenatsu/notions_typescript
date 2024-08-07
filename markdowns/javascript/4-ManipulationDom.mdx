@@ -1,0 +1,682 @@
+---
+title: Manipulation du DOM
+description: Les différentes méthodes
+---
+
+## Sélecteurs
+
+### document.getElementById
+
+<Pre>
+```html
+<article id="natsu" class="card" style="width: 18rem;">
+  <img src="/img/1.jpg" class="card-img-top" alt="Photo de Natsu">
+  <div class="card-body">
+    <h5 class="card-title">Natsu</h5>
+    <p class="card-text">Golden Retriever</p>
+    <p class="card-text">13ans</p>
+    <a href="#" class="btn btn-primary">Go somewhere</a>
+  </div>
+</article>
+```
+</Pre>
+
+<Pre>
+```js 
+const natsu = document.getElementById("natsu"); 
+console.log("ById:",natsu); 
+```
+</Pre>
+
+![console](/getElementById.jpg "getElementById")
+
+### document.getElementsByClassName
+
+<Pre>
+```html
+<article id="natsu" class="card" style="width: 18rem;">
+  <img src="/img/1.jpg" class="card-img-top" alt="Photo de Natsu">
+  <div class="card-body">
+    <h5 class="card-title">Natsu</h5>
+    <p class="card-text">Golden Retriever</p>
+    <p class="card-text">13ans</p>
+    <a href="#" class="btn btn-primary">Go somewhere</a>
+  </div>
+</article>
+<article id="rackham" class="card" style="width: 18rem;">
+  <img src="/img/1.jpg" class="card-img-top" alt="Photo de Rackham">
+  <div class="card-body">
+    <h5 class="card-title">Rackham</h5>
+    <p class="card-text">Croisé Border</p>
+    <p class="card-text">4ans</p>
+    <a href="#" class="btn btn-primary">Go somewhere</a>
+  </div>
+</article>
+<article id="louxia" class="card" style="width: 18rem;">
+  <img src="/img/1.jpg" class="card-img-top" alt="Photo de Natsu">
+  <div class="card-body">
+    <h5 class="card-title">Natsu</h5>
+    <p class="card-text race">Golden Retriever</p>
+    <p class="card-text age">13ans</p>
+    <a href="#" class="btn btn-primary">Go somewhere</a>
+  </div>
+</article>
+```
+</Pre>
+
+<Pre>
+```js 
+// HTML collection
+const cards = document.getElementsByClassName("card");
+console.log("ByClassName: ", cards);
+```
+</Pre>
+
+![console](/getElementsByClassName.jpg "getElementByClassName")
+
+
+### document.getElementsByTagName
+
+<Pre>
+```html
+<article id="natsu" class="card" style="width: 18rem;">
+  <img src="/img/1.jpg" class="card-img-top" alt="Photo de Natsu">
+  <div class="card-body">
+    <h5 class="card-title">Natsu</h5>
+    <p class="card-text">Golden Retriever</p>
+    <p class="card-text">13ans</p>
+    <a href="#" class="btn btn-primary">Go somewhere</a>
+  </div>
+</article>
+<article id="rackham" class="card" style="width: 18rem;">
+  <img src="/img/1.jpg" class="card-img-top" alt="Photo de Rackham">
+  <div class="card-body">
+    <h5 class="card-title">Rackham</h5>
+    <p class="card-text">Croisé Border</p>
+    <p class="card-text">4ans</p>
+    <a href="#" class="btn btn-primary">Go somewhere</a>
+  </div>
+</article>
+<article id="louxia" class="card" style="width: 18rem;">
+  <img src="/img/1.jpg" class="card-img-top" alt="Photo de Natsu">
+  <div class="card-body">
+    <h5 class="card-title">Natsu</h5>
+    <p class="card-text race">Golden Retriever</p>
+    <p class="card-text age">13ans</p>
+    <a href="#" class="btn btn-primary">Go somewhere</a>
+  </div>
+</article>
+```
+</Pre>
+
+<Pre>
+```js 
+// HTML collection
+const articles = document.getElementsByTagName("article");
+console.log("ByTagName: ", articles);
+```
+</Pre>
+
+![console](/getElementsByTagName.jpg "getElementByTagName")
+
+
+### document.querySelector
+
+<Pre>
+```html
+<article id="rackham" class="card" style="width: 18rem;">
+  <img src="/img/1.jpg" class="card-img-top" alt="Photo de Rackham">
+  <div class="card-body">
+    <h5 class="card-title">Rackham</h5>
+    <p class="card-text">Croisé Border</p>
+    <p class="card-text">4ans</p>
+    <a href="#" class="btn btn-primary">Go somewhere</a>
+  </div>
+</article>
+```
+</Pre>
+
+<Pre>
+```js 
+const rackham = document.querySelector("#rackham");
+console.log("querySelector: ", rackham);
+```
+</Pre>
+
+![console](/querySelector.jpg "querySelector")
+
+
+### document.querySelectorAll
+
+<Pre>
+```html
+<article id="natsu" class="card" style="width: 18rem;">
+  <img src="/img/1.jpg" class="card-img-top" alt="Photo de Natsu">
+  <div class="card-body">
+    <h5 class="card-title">Natsu</h5>
+    <p class="card-text">Golden Retriever</p>
+    <p class="card-text">13ans</p>
+    <a href="#" class="btn btn-primary">Go somewhere</a>
+  </div>
+</article>
+<article id="rackham" class="card" style="width: 18rem;">
+  <img src="/img/1.jpg" class="card-img-top" alt="Photo de Rackham">
+  <div class="card-body">
+    <h5 class="card-title">Rackham</h5>
+    <p class="card-text">Croisé Border</p>
+    <p class="card-text">4ans</p>
+    <a href="#" class="btn btn-primary">Go somewhere</a>
+  </div>
+</article>
+<article id="louxia" class="card" style="width: 18rem;">
+  <img src="/img/1.jpg" class="card-img-top" alt="Photo de Natsu">
+  <div class="card-body">
+    <h5 class="card-title">Natsu</h5>
+    <p class="card-text race">Golden Retriever</p>
+    <p class="card-text age">13ans</p>
+    <a href="#" class="btn btn-primary">Go somewhere</a>
+  </div>
+</article>
+```
+</Pre>
+
+<Pre>
+```js 
+// Node List
+const titleCards = document.querySelectorAll(".card-title");
+console.log("querySelectorAll: ", titleCards);
+```
+</Pre>
+
+![console](/querySelectorAll.jpg "querySelectorAll")
+
+
+## Itérer des HTML collection ou Node
+
+<Pre>
+```js 
+// Boucle for (HTML collection ou Node)
+const cards = document.getElementsByClassName("card");
+for (let i = 0; i < cards.length; i++) {
+  console.log("Card:", cards[i]);
+}
+
+// Boucle for of (HTML collection ou Node)
+const titleCards = document.querySelectorAll(".card-title");
+for (let titleCard of titleCards) {
+  console.log("titleCard", titleCard);
+}
+
+// forEach 
+  // Requiert une conversion en array pour une HTML collection
+Array.from(cards).forEach((card) => {
+  console.log("Card", card);
+});
+  // Pas de conversion en array pour une Node Collection
+titleCards.forEach((titleCard) => {
+  console.log("titleCard", titleCard);
+});
+```
+</Pre>
+
+
+## Modification de contenu et d'attributs
+
+### InnerHTML (peut insérer du texte brut mais aussi du code HTML)
+
+<Pre>
+```html
+<article id="louxia" class="card" style="width: 18rem;">
+  <img src="/img/1.jpg" class="card-img-top" alt="Photo de Natsu">
+  <div class="card-body">
+    <h5 class="card-title">Natsu</h5>
+    <p class="card-text race">Golden Retriever</p>
+    <p class="card-text age">13ans</p>
+    <a href="#" class="btn btn-primary">Go somewhere</a>
+  </div>
+</article>
+```
+</Pre>
+
+<Pre>
+```js 
+const louxia = document.getElementById("louxia");
+const cardTitleLouxia = louxia.querySelector(".card-title");
+cardTitleLouxia.innerHTML = "Louxia"
+```
+</Pre>
+
+![console](/innerHTML.webp "innerHTML")
+
+### textContent (peut insérer uniquement du texte brut)
+
+<Pre>
+```html
+<article id="louxia" class="card" style="width: 18rem;">
+  <img src="/img/1.jpg" class="card-img-top" alt="Photo de Natsu">
+  <div class="card-body">
+    <h5 class="card-title">Natsu</h5>
+    <p class="card-text race">Golden Retriever</p>
+    <p class="card-text age">13ans</p>
+    <a href="#" class="btn btn-primary">Go somewhere</a>
+  </div>
+</article>
+```
+</Pre>
+
+<Pre>
+```js 
+const cardRaceLouxia = louxia.querySelector(".race");
+console.log(cardRaceLouxia);
+cardRaceLouxia.textContent = "Berger Australien"
+```
+</Pre>
+
+![console](/textContent.webp "textContent")
+
+
+### setAttribute
+
+<Pre>
+```html
+<article id="natsu" class="card" style="width: 18rem;">
+  <img src="/img/1.jpg" class="card-img-top" alt="Photo de Natsu">
+  <div class="card-body">
+    <h5 class="card-title">Natsu</h5>
+    <p class="card-text">Golden Retriever</p>
+    <p class="card-text">13ans</p>
+    <a href="#" class="btn btn-primary">Go somewhere</a>
+  </div>
+</article>
+```
+</Pre>
+
+<Pre>
+```js 
+const cardTitleNatsu = natsu.querySelector(".card-title");
+cardTitleNatsu.setAttribute("id", "titleNatsu")
+```
+</Pre>
+
+![console](/setAttribute.webp "setAttribute")
+
+
+### getAttribute
+
+<Pre>
+```js 
+console.log(cardTitleNatsu.getAttribute("id"));
+```
+</Pre>
+
+![console](/getAttribute.jpg "getAttribute")
+
+### removeAttribute
+
+<Pre>
+```js 
+console.log(cardTitleNatsu.removeAttribute("id"));
+```
+</Pre>
+
+![console](/removeAttribute.jpg "removeAttribute")
+
+
+## Style et Classe
+
+### style....
+
+<Pre>
+```html
+<article id="louxia" class="card" style="width: 18rem;">
+  <img src="/img/1.jpg" class="card-img-top" alt="Photo de Natsu">
+  <div class="card-body">
+    <h5 class="card-title">Natsu</h5>
+    <p class="card-text race">Golden Retriever</p>
+    <p class="card-text age">13ans</p>
+    <a href="#" class="btn btn-primary">Go somewhere</a>
+  </div>
+</article>
+```
+</Pre>
+
+<Pre>
+```js 
+const louxia = document.getElementById("louxia");
+louxia.style.color = "red"
+```
+</Pre>
+
+![console](/style.jpg "style")
+
+
+### classList.add
+
+<Pre>
+```html
+<article id="louxia" class="card" style="width: 18rem;">
+  <img src="/img/1.jpg" class="card-img-top" alt="Photo de Natsu">
+  <div class="card-body">
+    <h5 class="card-title">Natsu</h5>
+    <p class="card-text race">Golden Retriever</p>
+    <p class="card-text age">13ans</p>
+    <a href="#" class="btn btn-primary">Go somewhere</a>
+  </div>
+</article>
+```
+</Pre>
+
+<Pre>
+```js 
+const natsu = getElementById("natsu")
+natsu.querySelector(".card-title").nextElementSibling.classList.add("race")
+```
+</Pre>
+
+![console](/classListadd.jpg "classListadd")
+
+
+### classList.remove
+
+<Pre>
+```js 
+natsu.querySelector(".card-title").nextElementSibling.classList.remove("race")
+```
+</Pre>
+
+![console](/classListremove.jpg "classListremove")
+
+
+### classList.toggle
+
+<Pre>
+```js 
+const button = document.createElement("button")
+button.textContent = "bouton pour changer la classe"
+button.classList.add("btn", "btn-warning")
+const container = document.getElementById("container")
+container.appendChild(button)
+button.addEventListener("click", () => {
+  natsu.querySelector(".card-title").nextElementSibling.classList.toggle("race")
+})
+```
+</Pre>
+
+![console](/toggleClass.webp "toggleClass")
+
+### classList.contains
+
+<Pre>
+```js 
+console.log(button.classList.contains("btn")); // true
+```
+</Pre>
+
+## Manipulation de la structure
+
+###  appendChild: Ajouter un élément à la fin du noeud parent
+
+<Pre>
+```js 
+const p = document.createElement("p");
+p.textContent = "AJouter un élément à la fin du noeud parent"
+p.style.color = "white"
+const container = document.getElementById("container")
+container.appendChild(p)
+```
+</Pre>
+
+![console](/appendChild.webp "appendChild")
+
+
+###  removeChild: Supprimer un élément à la fin du noeud parent
+
+<Pre>
+```js 
+container.removeChild(p)
+```
+</Pre>
+
+![console](/removeChild.webp "removeChild")
+
+###  replaceChild: Remplacer un enfant par un autre
+
+<Pre>
+```js 
+container.appendChild(p)
+const p2 = document.createElement("p")
+p2.textContent = "Je remplace le paragraph p par p2"
+p2.style.color = "white"
+
+container.replaceChild(p2, p)
+```
+</Pre>
+
+![console](/replaceChild.webp "replaceChild")
+
+###  insertBefore: Insérer un élément avant un autre élément
+
+<Pre>
+```js 
+container.insertBefore(p, p2)
+```
+</Pre>
+
+![console](/insertBefore.webp "insertBefore")
+
+
+## Création et clonage d'élément
+
+
+### createElement
+
+<Pre>
+```js 
+const p3 = document.createElement("p")
+```
+</Pre>
+
+### createTextNode
+
+<Pre>
+```js 
+const newText = document.createTextNode('coucou')
+p3.appendChild(newText)
+p3.style.color = "white"
+container.appendChild(p3)
+```
+</Pre>
+
+![console](/createTextNode.webp "createTextNode")
+
+### cloneNode : cloner un élement (peut cloner aussi un template)
+
+<Pre>
+```js 
+const cloneElement = p3.cloneNode(true)
+console.log("l'élément cloné: " , cloneElement);
+```
+</Pre>
+
+![console](/cloneNode.jpg "cloneNode")
+
+
+## Evenements
+
+### addEventListener : Ajoute un évenement
+
+<Pre>
+```js 
+const button2 = document.createElement('button')
+button2.textContent = "Bouton pour effectuer un évenement click"
+container.appendChild(button2)
+button2.classList.add("btn","btn-success")
+const handleCLick = () => {
+    alert("Tu as bien cliqué")
+}
+button2.addEventListener('click', handleCLick);
+```
+</Pre>
+
+![console](/addEventListener.webp "addEventListener")
+
+### removeEventListener : Supprime un évenement
+
+<Pre>
+```js 
+button2.removeEventListener('click', handleCLick);
+```
+</Pre>
+
+![console](/removeEventListener.webp "removeEventListener")
+
+
+## Navigation dans le DOM
+
+### parentNode: Quel est le parent de...
+
+
+![console](/parentNode1.jpg "parentNode")
+
+<Pre>
+```js 
+console.log("parent de button2: ",button2.parentNode); 
+```
+</Pre>
+
+![console](/parentNode.jpg "parentNode")
+
+
+### children: Quels sont les enfants de... (inclus uniquement les éléments HTML - HTML collection)
+
+<Pre>
+```html
+<article id="natsu" class="card" style="width: 18rem;">
+  <img src="/img/1.jpg" class="card-img-top" alt="Photo de Natsu">
+  <div class="card-body">
+    <h5 class="card-title">Natsu</h5>
+    <p class="card-text">Golden Retriever</p>
+    <p class="card-text">13ans</p>
+    <a href="#" class="btn btn-primary">Go somewhere</a>
+  </div>
+</article>
+```
+</Pre>
+
+<Pre>
+```js 
+console.log("les enfants de natsu: ", natsu.children);
+```
+</Pre>
+
+![console](/children.jpg "children")
+
+### childNodes: Quels sont les enfants de... (inclus également espace et retour à la ligne - NodeList)
+
+<Pre>
+```js 
+console.log("les enfants de natsu: ",natsu.childNodes);
+```
+</Pre>
+
+![console](/childNodes.jpg "childNodes")
+
+### children: Quels sont les enfants de... (inclus uniquement les éléments HTML - HTML collection)
+
+<Pre>
+```html
+<article id="natsu" class="card" style="width: 18rem;">
+  <img src="/img/1.jpg" class="card-img-top" alt="Photo de Natsu">
+  <div class="card-body">
+    <h5 class="card-title">Natsu</h5>
+    <p class="card-text">Golden Retriever</p>
+    <p class="card-text">13ans</p>
+    <a href="#" class="btn btn-primary">Go somewhere</a>
+  </div>
+</article>
+```
+</Pre>
+
+<Pre>
+```js 
+console.log("les enfants de natsu: ", natsu.children);
+```
+</Pre>
+
+![console](/children.jpg "children")
+
+### firstChildElement: Quel est le premier enfant de... (Element HTML)
+### LastChildElement: Quel est le dernier enfant de... (Element HTML)
+
+<Pre>
+```js 
+console.log("le premier enfant de natsu: ", natsu.firstElementChild);
+console.log("le dernier enfant de natsu: ", natsu.lastElementChild);
+```
+</Pre>
+
+![console](/firstLastElementChild.jpg "firstLastElementChild")
+
+### firstChild: Quel est le premier noeud enfant de... (espace blanc/retour à la ligne)
+### lastChild: Quel est le dernier noeud enfant de... (espace blanc/retour à la ligne)
+
+<Pre>
+```js 
+console.log("le premier enfant de natsu: ", natsu.firstChild);
+console.log("le dernier enfant de natsu: ", natsu.lastChild);
+```
+</Pre>
+
+![console](/firstLastChild.jpg "firstLastChild")
+
+
+### nextElementSibling: Quel est le prochain element sur le meme niveau...
+### previousElementSibling: Quel est le précédent element sur le meme niveau... 
+
+<Pre>
+```js 
+console.log("le prochain element sur le meme niveau que natsu: ", natsu.nextElementSibling);
+console.log("le précédent element sur le meme niveau que natsu: ", natsu.previousElementSibling);
+```
+</Pre>
+
+![console](/nextPreviousElementSibling.jpg "nextPreviousElementSibling")
+
+### nextSibling: Quel est le prochain noeud sur le meme niveau...
+### previousSibling: Quel est le précédent noeud sur le meme niveau... 
+
+<Pre>
+```js 
+console.log("le prochain element sur le meme niveau que natsu: ", natsu.nextSibling);
+console.log("le précédent element sur le meme niveau que natsu: ", natsu.previousSibling);
+```
+</Pre>
+
+![console](/nextPreviousSibling.jpg "nextPreviousSibling")
+
+
+### closest: Parcours l'élément courant jusqu'à la racine pour trouver l'élément parent voulu
+
+<Pre>
+```html
+<article id="natsu" class="card" style="width: 18rem;">
+  <img src="/img/1.jpg" class="card-img-top" alt="Photo de Natsu">
+  <div class="card-body">
+    <h5 class="card-title">Natsu</h5>
+    <p class="card-text">Golden Retriever</p>
+    <p class="card-text">13ans</p>
+    <a id=lien href="#" class="btn btn-primary">Go somewhere</a>
+  </div>
+</article>
+```
+</Pre>
+
+<Pre>
+```js 
+const lien = document.getElementById('lien');
+console.log("le lien parent: ", lien.closest('.card-body'));
+```
+</Pre>
+
+![console](/closest.jpg "closest")
+
